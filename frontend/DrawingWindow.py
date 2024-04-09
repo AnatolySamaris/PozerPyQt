@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QLabel, QAppli
 from PyQt5.QtGui import QPainter, QBrush, QPen
 from PyQt5.QtCore import Qt
 
-from HelpWindow import HelpWindow
+from frontend.HelpWindow import HelpWindow
 #from ModeWindow import ModeWindow
-from test import ModeWindow
+#from test import ModeWindow
 
 import sys
 
@@ -66,12 +66,13 @@ class DrawingWindow(QMainWindow):
         helpWindow.show()
 
     def showModeActionMenu(self):
+        pass
         #modeWindow = ModeWindow()
         #modeWindow.show()
-        app = QApplication(sys.argv)
-        MainWindow = QMainWindow()
-        ui = ModeWindow()
-        MainWindow.show()
+        #app = QApplication(sys.argv)
+        #MainWindow = QMainWindow()
+        #ui = ModeWindow()
+        #MainWindow.show()
 
     def clearField(self):
         print(3)
