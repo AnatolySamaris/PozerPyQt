@@ -1,6 +1,11 @@
 from PyQt5.QtWidgets import QApplication
-from frontend.DrawingWindow import DrawingWindow
 import sys
+
+sys.path.append('./backend')
+sys.path.append('./frontend')
+
+
+from frontend.DrawingWindow import DrawingWindow
 
 
 if __name__ == "__main__":
