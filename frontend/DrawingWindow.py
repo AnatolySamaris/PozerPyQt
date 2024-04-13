@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QLabel, QAppli
 from PyQt5.QtGui import QPainter, QBrush, QPen
 from PyQt5.QtCore import Qt
 
-from frontend.HelpWindow import HelpWindow
-#from ModeWindow import ModeWindow
-#from test import ModeWindow
+from .HelpWindow import HelpWindow
+#from .ModeWindow import ModeWindow
+from .test import ModeWindow
 
 import sys
 
