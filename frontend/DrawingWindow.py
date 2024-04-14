@@ -66,12 +66,13 @@ class DrawingWindow(QMainWindow):
         helpWindow.show()
 
     def showModeActionMenu(self):
+        pass
         #modeWindow = ModeWindow()
         #modeWindow.show()
-        app = QApplication(sys.argv)
-        MainWindow = QMainWindow()
-        ui = ModeWindow()
-        MainWindow.show()
+        #app = QApplication(sys.argv)
+        #MainWindow = QMainWindow()
+        #ui = ModeWindow()
+        #MainWindow.show()
 
     def clearField(self):
         print(3)
