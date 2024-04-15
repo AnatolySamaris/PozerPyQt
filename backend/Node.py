@@ -8,6 +8,22 @@ class Node:
         self.costs = None
         self.endNode = False
 
+        # STATIC FIELDS
+        window_width = 0
+        window_height = 0
+        node_size = 0
+        x_paint_zero = 0
+        y_paint_zero = 0
+        tree_height = 0
+
+    def setup_static(window_width, window_height, x_painting_zero, y_painting_zero, node_size, tree_height=0):
+        Node.window_width = window_width
+        Node.window_height = window_height
+        Node.x_painting_zero = x_painting_zero
+        Node.y_painting_zero = y_painting_zero
+        Node.node_size = node_size
+        Node.tree_height = tree_height
+
 
     def setX(self, xCoordinate):
         self.xCoordinate = xCoordinate

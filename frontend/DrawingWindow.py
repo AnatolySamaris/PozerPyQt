@@ -61,12 +61,22 @@ class DrawingWindow(QMainWindow):
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
         self.root_y = self.y_paint_zero
+
+        ##############################
+        # === TREE INITIALIZATION ===
+        ##############################
+        Node.setup_static(
+            self.width,
+            self.height,
+            self.x_paint_zero,
+            self.y_paint_zero,
+            self.node_size
+        )
+
         self.root = Node(1, None, self.root_x, self.root_y)
 
-        node1 = Node(2, self.root, 100, 100)
-        node2 = Node(2, self.root, 500, 100)
-        self.root.addChild(node1)
-        self.root.addChild(node2)
+        self.create_node(self.root)
+        self.create_node(self.root)
 
 
     def resizeEvent(self, event):
@@ -74,15 +84,23 @@ class DrawingWindow(QMainWindow):
         self.width, self.height = new_size.width(), new_size.height()
 
         # Update coordinates of all the nodes
-        self.root_x = self.x_paint_zero + self.width // 2 - self.node_size // 2
-        self.root.setX(self.root_x)
+        self.root.graphTraverse(
+            self.root.recalculateNode(self.root)
+        )
+        #self.root_x = self.x_paint_zero + self.width // 2 - self.node_size // 2
+        #self.root.setX(self.root_x)
 
         self.update()
     
-    def add_child(self, parent: Node):
-        child = Node(parent.getLevel() + 1, parent)
-        parent.addChild(child)
-        # Необходимо пересчитать координаты всего дерева сразу
+    def create_node(self, parent: Node|None):
+        if parent is None:
+            self.root = Node(1)
+        else:
+            child = Node(parent.getLevel() + 1, parent)
+            parent.addChild(child)
+        self.root.graphTraverse(
+            self.root.recalculateNode(self.root)
+        )
     
 
     def paintEvent(self, event):
