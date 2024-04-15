@@ -1,16 +1,18 @@
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QLabel, QApplication
 
-from PyQt5.QtGui import QPainter, QBrush, QPen
+from PyQt5.QtGui import QPaintEvent, QPainter, QBrush, QPen, QColor, QFont, QResizeEvent
 from PyQt5.QtCore import Qt
 
 from .HelpWindow import HelpWindow
 from .ModeWindow import ModeWindow
 
+from backend.Node import Node
+
 
 class DrawingWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        
 
         ########################
         # === WINDOW CONFIG ===
@@ -50,7 +52,63 @@ class DrawingWindow(QMainWindow):
         # === VARIABLES ===
         ########################
         self.task_number = -1
+        self.node_size = 40
+        self.letter_size = 16
+        self.x_letter_position = int(self.node_size * 0.3)
+        self.y_letter_position = int(self.node_size * 0.7)
+        self.x_paint_zero = 0
+        self.y_paint_zero = 30
 
+        self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
+        self.root_y = self.y_paint_zero
+        self.root = Node(1, None, self.root_x, self.root_y)
+
+        node1 = Node(2, self.root, 100, 100)
+        node2 = Node(2, self.root, 500, 100)
+        self.root.addChild(node1)
+        self.root.addChild(node2)
+
+
+    def resizeEvent(self, event):
+        new_size = event.size()
+        self.width, self.height = new_size.width(), new_size.height()
+
+        # Update coordinates of all the nodes
+        self.root_x = self.x_paint_zero + self.width // 2 - self.node_size // 2
+        self.root.setX(self.root_x)
+
+        self.update()
+    
+    def add_child(self, parent: Node):
+        child = Node(parent.getLevel() + 1, parent)
+        parent.addChild(child)
+        # Необходимо пересчитать координаты всего дерева сразу
+    
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setFont(QFont('Arial', self.letter_size))
+        painter.setPen(QPen(QColor(Qt.black), 2))
+        painter.setRenderHint(QPainter.Antialiasing, True)
+
+        self.draw_node(
+            painter,
+            self.root
+        )
+
+        painter.end()
+        
+    
+    def draw_node(self, painter: QPainter, node: Node):
+        painter.drawEllipse(*node.getPosition(), self.node_size, self.node_size)
+        painter.drawText(
+            node.getX() + self.x_letter_position,
+            node.getY() + self.y_letter_position,
+            'A' if node.getLevel() % 2 else 'B'
+        )
+
+    def connect_nodes(self, node1, node2):
+        pass
 
     def center(self):
         qr = self.frameGeometry()
