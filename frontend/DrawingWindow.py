@@ -5,10 +5,7 @@ from PyQt5.QtGui import QPainter, QBrush, QPen
 from PyQt5.QtCore import Qt
 
 from .HelpWindow import HelpWindow
-#from .ModeWindow import ModeWindow
-from .test import ModeWindow
-
-import sys
+from .ModeWindow import ModeWindow
 
 
 class DrawingWindow(QMainWindow):
@@ -49,35 +46,34 @@ class DrawingWindow(QMainWindow):
         self.menubar.addAction(clearFieldAction)
         self.menubar.addAction(startSolution)
 
-        self.number_label = QLabel('Nothing')
+        ########################
+        # === VARIABLES ===
+        ########################
+        self.task_number = -1
+
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-    
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setPen(QPen(Qt.red, 2))
 
     def showHelpMenu(self):
-        helpWindow = HelpWindow(self)
-        helpWindow.show()
+        help_window = HelpWindow(self)
+        help_window.show()
 
     def showModeActionMenu(self):
-        #modeWindow = ModeWindow()
-        #modeWindow.show()
-        app = QApplication(sys.argv)
-        MainWindow = QMainWindow()
-        ui = ModeWindow()
-        MainWindow.show()
+        mode_window = ModeWindow(self)
+        mode_window.show()
 
     def clearField(self):
-        print(3)
+        pass
 
     def startSolution(self):
-        print(4)
+        pass
+
+    def set_task_number(self, num: int):
+        self.task_number = num
 
     def redraw(self):
         self.update()
