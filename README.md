@@ -21,6 +21,10 @@ Before start of any development, you must activate virtual env:
 
 `pip install -r requirements.txt`
 
+- Update requirements.txt:
+
+`pip freeze > requirements.txt`
+
 ### Run project
 
 `python main.py`
