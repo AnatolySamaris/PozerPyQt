@@ -151,8 +151,8 @@ class Node:
         self.setY(paintingZeroY + nodeSize * (self.getLevel() - 1) + spaceVertical * (self.getLevel() - 1))
 
         # считаем X координату
-        levelNodesAmount = self.countLevelNodes(root, self)
-        nodeLevelOrder = self.findNodeLevelOrder(root, self)
+        levelNodesAmount = root.countLevelNodes(self)
+        nodeLevelOrder = root.findNodeLevelOrder(self)
         spaceHoriz = (widthWindow - nodeSize * levelNodesAmount) / (levelNodesAmount + 1)
         self.setX(paintingZeroX + nodeSize * (nodeLevelOrder - 1) + spaceHoriz * nodeLevelOrder)
 
