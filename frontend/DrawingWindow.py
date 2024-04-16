@@ -1,19 +1,18 @@
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QLabel, QApplication
 
-from PyQt5.QtGui import QPainter, QBrush, QPen
+from PyQt5.QtGui import QPaintEvent, QPainter, QBrush, QPen, QColor, QFont, QResizeEvent
 from PyQt5.QtCore import Qt
 
 from .HelpWindow import HelpWindow
-#from .ModeWindow import ModeWindow
-from .test import ModeWindow
+from .ModeWindow import ModeWindow
 
-import sys
+from backend.Node import Node
 
 
 class DrawingWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        
 
         ########################
         # === WINDOW CONFIG ===
@@ -49,36 +48,108 @@ class DrawingWindow(QMainWindow):
         self.menubar.addAction(clearFieldAction)
         self.menubar.addAction(startSolution)
 
-        self.number_label = QLabel('Nothing')
+        ########################
+        # === VARIABLES ===
+        ########################
+        self.task_number = -1
+        self.node_size = 40
+        self.letter_size = 16
+        self.x_letter_position = int(self.node_size * 0.3)
+        self.y_letter_position = int(self.node_size * 0.7)
+        self.x_paint_zero = 0
+        self.y_paint_zero = 30
+
+        self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
+        self.root_y = self.y_paint_zero
+
+        ##############################
+        # === TREE INITIALIZATION ===
+        ##############################
+        Node.setup_static(
+            self.width,
+            self.height,
+            self.x_paint_zero,
+            self.y_paint_zero,
+            self.node_size
+        )
+
+        self.root = Node(1, None, self.root_x, self.root_y)
+
+        self.create_node(self.root)
+        self.create_node(self.root)
+
+
+    def resizeEvent(self, event):
+        new_size = event.size()
+        self.width, self.height = new_size.width(), new_size.height()
+
+        # Update coordinates of all the nodes
+        self.root.graphTraverse(
+            self.root.recalculateNode(self.root)
+        )
+        #self.root_x = self.x_paint_zero + self.width // 2 - self.node_size // 2
+        #self.root.setX(self.root_x)
+
+        self.update()
+    
+    def create_node(self, parent: Node|None):
+        if parent is None:
+            self.root = Node(1)
+        else:
+            child = Node(parent.getLevel() + 1, parent)
+            parent.addChild(child)
+        self.root.graphTraverse(
+            self.root.recalculateNode(self.root)
+        )
+    
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setFont(QFont('Arial', self.letter_size))
+        painter.setPen(QPen(QColor(Qt.black), 2))
+        painter.setRenderHint(QPainter.Antialiasing, True)
+
+        self.draw_node(
+            painter,
+            self.root
+        )
+
+        painter.end()
+        
+    
+    def draw_node(self, painter: QPainter, node: Node):
+        painter.drawEllipse(*node.getPosition(), self.node_size, self.node_size)
+        painter.drawText(
+            node.getX() + self.x_letter_position,
+            node.getY() + self.y_letter_position,
+            'A' if node.getLevel() % 2 else 'B'
+        )
+
+    def connect_nodes(self, node1, node2):
+        pass
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-    
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setPen(QPen(Qt.red, 2))
 
     def showHelpMenu(self):
-        helpWindow = HelpWindow(self)
-        helpWindow.show()
+        help_window = HelpWindow(self)
+        help_window.show()
 
     def showModeActionMenu(self):
-        pass
-        #modeWindow = ModeWindow()
-        #modeWindow.show()
-        #app = QApplication(sys.argv)
-        #MainWindow = QMainWindow()
-        #ui = ModeWindow()
-        #MainWindow.show()
+        mode_window = ModeWindow(self)
+        mode_window.show()
 
     def clearField(self):
-        print(3)
+        pass
 
     def startSolution(self):
-        print(4)
+        pass
+
+    def set_task_number(self, num: int):
+        self.task_number = num
 
     def redraw(self):
         self.update()

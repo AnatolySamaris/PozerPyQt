@@ -1,13 +1,11 @@
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets, QtCore, QtGui
 
-
-class ModeWindow(QMainWindow):
+class ModeWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setObjectName("MainWindow")
         self.resize(320, 180)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setMaximumSize(QtCore.QSize(400, 350))
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -20,9 +18,6 @@ class ModeWindow(QMainWindow):
         self.gridLayout.setObjectName("gridLayout")
         self.lineEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.lineEdit.setMaximumSize(QtCore.QSize(150, 30))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.lineEdit.setFont(font)
         self.lineEdit.setMaxLength(3)
         self.lineEdit.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.lineEdit.setObjectName("lineEdit")
@@ -33,9 +28,6 @@ class ModeWindow(QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.radioButton.sizePolicy().hasHeightForWidth())
         self.radioButton.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.radioButton.setFont(font)
         self.radioButton.setObjectName("radioButton")
         self.gridLayout.addWidget(self.radioButton, 0, 0, 1, 1)
         self.radioButton_2 = QtWidgets.QRadioButton(self.gridLayoutWidget)
@@ -56,40 +48,24 @@ class ModeWindow(QMainWindow):
         font.setPointSize(8)
         self.ok.setFont(font)
         self.ok.setObjectName("ok")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 320, 26))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        MainWindow.setWindowTitle("Режим ввода")
-        MainWindow.setGeometry(300, 300, 320, 180)
-        self.center()
+        self.setStatusBar(self.statusbar)
+        self.setWindowTitle("Режим ввода")
+        self.setGeometry(300, 300, 320, 180)
         self.radioButton.setText("Ввод из файла")
         self.radioButton_2.setText("Ввод вручную")
         self.ok.setText("OK")
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-
-    def getNum(self):
-        return 10005000
-    
-    def print(self):
-        pass
-
-"""
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = ModeWindow()
-    MainWindow.show()
-    sys.exit(app.exec())
-"""
+    window = ModeWindow()
+    window.show()
+    sys.exit(app.exec_())
