@@ -4,7 +4,7 @@ class Node:
         self.level = level
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
-        self.children = None
+        self.children = []
         self.costs = None
         self.endNode = False
 
@@ -102,7 +102,7 @@ class Node:
     # рекурсивная функция обхода графа, вызывающая некоторую
     # функцию для каждой вершины
     def graphTraverse(self, function):
-        function()
+        function(self)
         for child in self.getChildren():
             child.graphTraverse(function)
 
@@ -137,7 +137,7 @@ class Node:
             try:
                 treeMap[node.getLevel()].append(node)
             except KeyError:
-                treeMap[node.getLevel()] = node
+                treeMap[node.getLevel()] = [node]
             for child in node.getChildren():
                 fillTreeMap(child, treeMap)
 
