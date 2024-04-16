@@ -1,10 +1,12 @@
+from typing import List
+
 class Node:
     def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None):
         self.parent = parent
         self.level = level
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
-        self.children = None
+        self.children = []
         self.costs = None
         self.endNode = False
 
@@ -102,19 +104,19 @@ class Node:
     # рекурсивная функция обхода графа, вызывающая некоторую
     # функцию для каждой вершины
     def graphTraverse(self, function):
-        function()
+        self.function()
         for child in self.getChildren():
             child.graphTraverse(function)
 
     # функция поиска ноды
     # в данном случае аргумент node - объект, с которым сравнивают
     # текущую ноду
-    def findNode(self, node: 'Node', nodeSize: int):
+    def findNode(self, click: List[int], nodeSize: int):
         if(
-            abs(self.getX() - node.getX()) <= nodeSize and
-            abs(self.getY() - node.getY()) <= nodeSize
-        ):
-            return node
+            abs(self.getX() + nodeSize // 2 - click[0]) <= nodeSize and
+            abs(self.getY() + nodeSize // 2 - click[1]) <= nodeSize
+        ): 
+            return self
         else:
             return None
 
@@ -137,7 +139,7 @@ class Node:
             try:
                 treeMap[node.getLevel()].append(node)
             except KeyError:
-                treeMap[node.getLevel()] = node
+                treeMap[node.getLevel()] = [node]
             for child in node.getChildren():
                 fillTreeMap(child, treeMap)
 

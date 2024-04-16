@@ -97,6 +97,10 @@ class ModeWindow(QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    def keyPressEvent(self, event):
+        if event.key() == 16777220:  # Key code for Enter key
+            self.handle_mode()
+
     def change_mode(self):
         if self.radioButton.isChecked():
             self.lineEdit.setDisabled(False)
@@ -123,5 +127,8 @@ class ModeWindow(QMainWindow):
                 else:
                     self.parent().set_task_number(int(self.lineEdit.text().strip()))
                     self.close()
+        else:
+            self.parent().set_task_number(-1)
+            self.close()
         
 
