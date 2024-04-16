@@ -104,7 +104,7 @@ class Node:
     # рекурсивная функция обхода графа, вызывающая некоторую
     # функцию для каждой вершины
     def graphTraverse(self, function):
-        self.function()
+        function(self)
         for child in self.getChildren():
             child.graphTraverse(function)
 
