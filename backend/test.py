@@ -10,6 +10,7 @@ n1 = Node(level = 1)
 # n1.addChild(n3)
 
 parser.createSchema(n1)
+parser.setCosts(parser.costs, parser.createEndNodesList(n1))
 
 # n1.graphTraverse(
 #     n1.graphTraverse(lambda: n1.recalculateNode(
@@ -22,3 +23,4 @@ n1.graphTraverse(lambda node: node.recalculateNode(
 ))
 
 print(n1.getChildren()[1].getChildren()[1].getChildren()[0].getY())
+print(n1.getChildren()[1].getChildren()[1].getChildren()[0].getChildren()[1].getChildren()[1].getCosts())
