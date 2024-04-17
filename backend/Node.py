@@ -5,7 +5,7 @@ class Node:
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
         self.children = []
-        self.costs = None
+        self.costs = ()
         self.endNode = False
 
         # STATIC FIELDS
@@ -74,6 +74,9 @@ class Node:
         return [self.xCoordinate, self.yCoordinate]
     
 
+    def setChildren(self, children: list):
+        self.children = children
+    
     def getChildren(self):
         return self.children
 
