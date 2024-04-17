@@ -777,6 +777,6 @@ class TaskParser:
     # функция присвоения выигрышей всем листам
     # принимает список с 36 выигрышами в зависимости от варианта,
     # а также список нод, сформированный функцией createEndNodesList
-    def setCosts(costs, lst):
-        for i in range(lst):
+    def setCosts(self, costs, lst):
+        for i in range(len(lst)):
             lst[i].setCosts(costs[i])
