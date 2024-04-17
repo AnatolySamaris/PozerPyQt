@@ -605,13 +605,14 @@ class TaskParser:
     }
 
     # по номеру варианта в поле с выигрышами записывается нужный список
-    def __init__(self, variant):
+    def __init__(self, variant, allCosts = allCosts):
+        self.allCosts = allCosts
         self.variant = variant
         self.costs = allCosts[variant]
 
     # создает схему, в качестве аргумента передавать root
-    def createSchema(node11):
-        node11 = Node(level=1)
+    def createSchema(self, node11):
+        # node11 = Node(level=1)
 
         node21 = Node(level = 2, parent = node11)
         node22 = Node(level = 2, parent = node11)
@@ -762,14 +763,14 @@ class TaskParser:
         node718 = Node(level = 7, parent = node625, endNode = True)
         node625.setChildren([node717, node718])
 
-    def checkEndNode(node: 'Node', lst: list):
+    def checkEndNode(self, node: 'Node', lst: list):
         if node.getEndNode(): lst.append(node)
 
     # формирует список всех 36 листов в нужном порядке
-    def createEndNodesList(root: 'Node'):
+    def createEndNodesList(self, root: 'Node'):
         lst = []
         root.graphTraverse(
-            lambda node: checkEndNode(node, lst)
+            lambda node: self.checkEndNode(node, lst)
         )
         return lst
 
