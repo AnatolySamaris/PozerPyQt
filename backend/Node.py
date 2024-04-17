@@ -1,12 +1,12 @@
 class Node:
-    def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None):
+    def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None, endNode = False):
         self.parent = parent
         self.level = level
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
         self.children = []
         self.costs = ()
-        self.endNode = False
+        self.endNode = endNode
 
         # STATIC FIELDS
         window_width = 0
