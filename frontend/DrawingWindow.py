@@ -10,8 +10,6 @@ from .AddDialog import AddDialog
 from backend.Node import Node
 from backend.TaskParser import TaskParser
 
-from typing import List
-
 def log(*args):
     print('=' * 20)
     print(*args, sep=' ')
@@ -79,13 +77,6 @@ class DrawingWindow(QMainWindow):
         ##############################
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
-        self.root.setCosts((1, 1))
-
-        #node_costs = self.root.getCosts()
-        #text = "(" + str(node_costs[0]) + "; " + str(node_costs[1]) + ")"
-        #label = QLabel(text, self)
-        #label.move(self.root.getX() + self.node_size, self.root.getY())
-
 
     def resizeEvent(self, event):
         new_size = event.size()
@@ -120,9 +111,14 @@ class DrawingWindow(QMainWindow):
         if node_costs:
             text = "(" + str(node_costs[0]) + "; " + str(node_costs[1]) + ")"
             label = QLabel(text, self)
+            label.setFont(QFont("Arial", 12))
             label.move(node.getX() + self.node_size, node.getY())
+            label.show()
     
     def paintEvent(self, event):
+        for label in self.findChildren(QLabel):
+            label.deleteLater()
+
         painter = QPainter(self)
         painter.setFont(QFont('Arial', self.letter_size))
         painter.setPen(QPen(QColor(Qt.black), 2))
@@ -159,6 +155,9 @@ class DrawingWindow(QMainWindow):
         )
         self.root.graphTraverse(
             lambda node: self.connect_nodes(painter, node.getParent(), node)
+        )
+        self.root.graphTraverse(
+            lambda node: self.create_cost_label(node)
         )
 
     def connect_nodes(self, painter: QPainter, from_node: Node, to_node: Node):
