@@ -20,12 +20,12 @@ class AddDialog(QDialog):
         super().__init__(parent)
         self.current_node = current_node
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setGeometry(x, y, 150, 90)
+        self.setGeometry(x, y, 170, 90)
         self.setStyleSheet("background-color: #e5e5e5; border: 1px solid black;")
         btn_add_child = QPushButton('Добавить потомка', self)
-        btn_add_child.setGeometry(10, 10, 130, 30)
+        btn_add_child.setGeometry(10, 10, 150, 30)
         btn_add_leaf = QPushButton('Добавить лист', self)
-        btn_add_leaf.setGeometry(10, 50, 130, 30)
+        btn_add_leaf.setGeometry(10, 50, 150, 30)
         btn_add_child.setStyleSheet("background-color: white; border: 1px solid black;")
         btn_add_leaf.setStyleSheet("background-color: white; border: 1px solid black;")
 
@@ -91,7 +91,7 @@ class DrawingWindow(QMainWindow):
         self.x_letter_position = int(self.node_size * 0.3)
         self.y_letter_position = int(self.node_size * 0.7)
         self.x_paint_zero = 0
-        self.y_paint_zero = 30
+        self.y_paint_zero = 35
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
         self.root_y = self.y_paint_zero
