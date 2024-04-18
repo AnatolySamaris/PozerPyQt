@@ -7,6 +7,7 @@ from .HelpWindow import HelpWindow
 from .ModeWindow import ModeWindow
 
 from backend.Node import Node
+from backend.TaskParser import TaskParser
 
 def log(*args):
     print('=' * 20)
@@ -102,8 +103,6 @@ class DrawingWindow(QMainWindow):
         ##############################
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
-        #self.create_node(self.root)
-        #self.create_node(self.root)
 
     def get_root(self):
         return self.root
@@ -130,8 +129,7 @@ class DrawingWindow(QMainWindow):
             child = Node(parent.getLevel() + 1, parent)
             if leaf: child.setEndNode(True)
             parent.addChild(child)
-        #self.tree_height += 1
-        self.root.updateTreeHeight(self.tree_height)
+        self.tree_height = self.root.updateTreeHeight(self.tree_height)
         self.root.graphTraverse(
             lambda node: node.recalculateNode(
                 self.root, self.height, self.width,
@@ -215,6 +213,22 @@ class DrawingWindow(QMainWindow):
                 )
                 self.add_dialog_opened = True
                 self.dialog.show()
+
+    def get_task_tree(self):
+        parser = TaskParser(self.task_number)
+        parser.createSchema(self.root)
+        self.tree_height = self.root.updateTreeHeight(self.tree_height)
+        log(self.root.getChildren())
+        log(self.tree_height)
+        self.root.graphTraverse(
+            lambda node: node.recalculateNode(
+                self.root, self.height, self.width,
+                self.y_paint_zero, self.x_paint_zero,
+                self.node_size, self.tree_height
+            )
+        )
+        self.update()
+        #parser.setCosts(self.root)
 
     def center(self):
         qr = self.frameGeometry()

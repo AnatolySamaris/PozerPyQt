@@ -126,6 +126,7 @@ class ModeWindow(QMainWindow):
                     )
                 else:
                     self.parent().set_task_number(int(self.lineEdit.text().strip()))
+                    self.parent().get_task_tree()
                     self.close()
         else:
             self.parent().set_task_number(-1)

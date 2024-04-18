@@ -763,20 +763,24 @@ class TaskParser:
         node718 = Node(level = 7, parent = node625, endNode = True)
         node625.setChildren([node717, node718])
 
-    def checkEndNode(self, node: 'Node', lst: list):
+    def __checkEndNode(self, node: 'Node', lst: list):
         if node.getEndNode(): lst.append(node)
 
     # формирует список всех 36 листов в нужном порядке
-    def createEndNodesList(self, root: 'Node'):
-        lst = []
-        root.graphTraverse(
-            lambda node: self.checkEndNode(node, lst)
-        )
-        return lst
+    #def createEndNodesList(self, root: 'Node'):
+    #    lst = []
+    #    root.graphTraverse(
+    #        lambda node: self.checkEndNode(node, lst)
+    #    )
+    #    return lst
 
     # функция присвоения выигрышей всем листам
     # принимает список с 36 выигрышами в зависимости от варианта,
     # а также список нод, сформированный функцией createEndNodesList
-    def setCosts(self, costs, lst):
+    def setCosts(self, root: 'Node'):
+        lst = []
+        root.graphTraverse(
+            lambda node: self.__checkEndNode(node, lst)
+        )
         for i in range(len(lst)):
-            lst[i].setCosts(costs[i])
+            lst[i].setCosts(self.costs[i])
