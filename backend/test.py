@@ -34,4 +34,8 @@ res = n1.graphTraverse(
     )
 )
 
-print(res.getLevel())
+height = 1
+height = n4.updateTreeHeight(height, n1)
+print(height)
+
+# print(res.getLevel())
