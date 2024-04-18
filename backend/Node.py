@@ -1,14 +1,14 @@
 from typing import List
 
 class Node:
-    def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None):
+    def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None, endNode = False):
         self.parent = parent
         self.level = level
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
         self.children = []
-        self.costs = None
-        self.endNode = False
+        self.costs = ()
+        self.endNode = endNode
 
         # STATIC FIELDS
         window_width = 0
@@ -76,6 +76,9 @@ class Node:
         return [self.xCoordinate, self.yCoordinate]
     
 
+    def setChildren(self, children: list):
+        self.children = children
+    
     def getChildren(self):
         return self.children
 
