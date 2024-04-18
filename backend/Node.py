@@ -147,15 +147,16 @@ class Node:
         spaceHoriz = (widthWindow - nodeSize * levelNodesAmount) / (levelNodesAmount + 1)
         self.setX(paintingZeroX + nodeSize * (nodeLevelOrder - 1) + spaceHoriz * nodeLevelOrder)
 
-    def updateTreeHeight(self, treeHeight):
-        def recursiveMaxHeight(root):
+    def updateTreeHeight(self, treeHeight, root: 'Node'):
+        def recursiveMaxHeight(node):
             # если нет детей
-            if not root.getChildren():
-                return root.getLevel()
+            if not node.getChildren():
+                return node.getLevel()
 
             maxHeight = 0
-            for child in root.getChildren():
+            for child in node.getChildren():
                 maxHeight = max(maxHeight, recursiveMaxHeight(child))
             return maxHeight
 
-        treeHeight = max(treeHeight, recursiveMaxHeight(self))
+        treeHeight = max(treeHeight, recursiveMaxHeight(root))
+        return treeHeight
