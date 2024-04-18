@@ -10,28 +10,11 @@ class Node:
         self.costs = ()
         self.endNode = endNode
 
-        # STATIC FIELDS
-        window_width = 0
-        window_height = 0
-        node_size = 0
-        x_paint_zero = 0
-        y_paint_zero = 0
-        tree_height = 0
-
-    def setup_static(window_width, window_height, x_painting_zero, y_painting_zero, node_size, tree_height=0):
-        Node.window_width = window_width
-        Node.window_height = window_height
-        Node.x_painting_zero = x_painting_zero
-        Node.y_painting_zero = y_painting_zero
-        Node.node_size = node_size
-        Node.tree_height = tree_height
-
-
     def setX(self, xCoordinate):
-        self.xCoordinate = xCoordinate
+        self.xCoordinate = int(xCoordinate)
 
     def setY(self, yCoordinate):
-        self.yCoordinate = yCoordinate
+        self.yCoordinate = int(yCoordinate)
 
     def getX(self):
         return self.xCoordinate
@@ -107,18 +90,21 @@ class Node:
     # рекурсивная функция обхода графа, вызывающая некоторую
     # функцию для каждой вершины
     def graphTraverse(self, function):
-        function(self)
+        res = function(self)
+        if res: return res
         for child in self.getChildren():
-            child.graphTraverse(function)
+            res = child.graphTraverse(function)
+            if res: return res
 
     # функция поиска ноды
     # в данном случае аргумент node - объект, с которым сравнивают
     # текущую ноду
     def findNode(self, click: List[int], nodeSize: int):
+        delta = nodeSize // 2
         if(
-            abs(self.getX() + nodeSize // 2 - click[0]) <= nodeSize and
-            abs(self.getY() + nodeSize // 2 - click[1]) <= nodeSize
-        ): 
+            abs(self.getX() + delta - click[0]) <= delta and
+            abs(self.getY() + delta - click[1]) <= delta
+        ):
             return self
         else:
             return None
@@ -161,15 +147,15 @@ class Node:
         spaceHoriz = (widthWindow - nodeSize * levelNodesAmount) / (levelNodesAmount + 1)
         self.setX(paintingZeroX + nodeSize * (nodeLevelOrder - 1) + spaceHoriz * nodeLevelOrder)
 
-    def updateTreeHeight(treeHeight, root: 'Node'):
-        def recursiveMaxHeight(self):
+    def updateTreeHeight(self, treeHeight):
+        def recursiveMaxHeight(root):
             # если нет детей
-            if not self.getChildren():
-                return self.getLevel()
+            if not root.getChildren():
+                return root.getLevel()
 
             maxHeight = 0
-            for child in self.getChildren():
+            for child in root.getChildren():
                 maxHeight = max(maxHeight, recursiveMaxHeight(child))
             return maxHeight
 
-        treeHeight = max(treeHeight, recursiveMaxHeight(root))
+        treeHeight = max(treeHeight, recursiveMaxHeight(self))
