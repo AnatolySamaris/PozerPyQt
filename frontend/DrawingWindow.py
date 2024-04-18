@@ -1,45 +1,21 @@
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QDialog, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QLabel
 
-from PyQt5.QtGui import QPaintEvent, QPainter, QBrush, QPen, QColor, QFont, QResizeEvent
-from PyQt5.QtCore import Qt, QPoint, QEvent
+from PyQt5.QtGui import QPainter, QPen, QColor, QFont
+from PyQt5.QtCore import Qt, QEvent
 
 from .HelpWindow import HelpWindow
 from .ModeWindow import ModeWindow
+from .AddDialog import AddDialog
 
 from backend.Node import Node
 from backend.TaskParser import TaskParser
+
+from typing import List
 
 def log(*args):
     print('=' * 20)
     print(*args, sep=' ')
     print('=' * 20)
-
-
-class AddDialog(QDialog):
-    def __init__(self, parent: QMainWindow, x: int, y: int, current_node: Node):
-        super().__init__(parent)
-        self.current_node = current_node
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setGeometry(x, y, 150, 90)
-        self.setStyleSheet("background-color: #e5e5e5; border: 1px solid black;")
-        btn_add_child = QPushButton('Добавить потомка', self)
-        btn_add_child.setGeometry(10, 10, 130, 30)
-        btn_add_leaf = QPushButton('Добавить лист', self)
-        btn_add_leaf.setGeometry(10, 50, 130, 30)
-        btn_add_child.setStyleSheet("background-color: white; border: 1px solid black;")
-        btn_add_leaf.setStyleSheet("background-color: white; border: 1px solid black;")
-
-        btn_add_child.clicked.connect(self.add_child)
-        btn_add_leaf.clicked.connect(self.add_leaf)
-    
-    def add_child(self):
-        self.parent().create_node(self.current_node)
-        self.parent().update()
-        
-    
-    def add_leaf(self):
-        self.parent().create_node(self.current_node, leaf=True)
-        self.parent().update()
 
 
 class DrawingWindow(QMainWindow):
@@ -91,7 +67,7 @@ class DrawingWindow(QMainWindow):
         self.x_letter_position = int(self.node_size * 0.3)
         self.y_letter_position = int(self.node_size * 0.7)
         self.x_paint_zero = 0
-        self.y_paint_zero = 30
+        self.y_paint_zero = 40
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
         self.root_y = self.y_paint_zero
@@ -103,15 +79,17 @@ class DrawingWindow(QMainWindow):
         ##############################
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
+        self.root.setCosts((1, 1))
 
-    def get_root(self):
-        return self.root
+        #node_costs = self.root.getCosts()
+        #text = "(" + str(node_costs[0]) + "; " + str(node_costs[1]) + ")"
+        #label = QLabel(text, self)
+        #label.move(self.root.getX() + self.node_size, self.root.getY())
+
 
     def resizeEvent(self, event):
         new_size = event.size()
         self.width, self.height = new_size.width(), new_size.height()
-        
-        # Update coordinates of all the nodes
         self.root.graphTraverse(
             lambda node: node.recalculateNode(
                 self.root, self.height, self.width,
@@ -119,7 +97,6 @@ class DrawingWindow(QMainWindow):
                 self.node_size, self.tree_height
             )
         )
-
         self.update()
     
     def create_node(self, parent: Node|None, leaf=False):
@@ -137,6 +114,13 @@ class DrawingWindow(QMainWindow):
                 self.node_size, self.tree_height
             )
         )
+    
+    def create_cost_label(self, node: Node):
+        node_costs = node.getCosts()
+        if node_costs:
+            text = "(" + str(node_costs[0]) + "; " + str(node_costs[1]) + ")"
+            label = QLabel(text, self)
+            label.move(node.getX() + self.node_size, node.getY())
     
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -167,6 +151,7 @@ class DrawingWindow(QMainWindow):
             )
             painter.setBrush(Qt.NoBrush)
             painter.setPen(QPen(QColor(Qt.black), 2))
+        self.create_cost_label(node)
 
     def draw_tree(self, painter: QPainter):
         self.root.graphTraverse(
@@ -204,7 +189,7 @@ class DrawingWindow(QMainWindow):
             clicked_node = self.root.graphTraverse(
                 lambda node: node.findNode(click_pos, self.node_size)
             )
-            if clicked_node:
+            if clicked_node and not clicked_node.getEndNode():
                 self.dialog = AddDialog(
                     self,
                     clicked_node.getX() + self.node_size,
@@ -218,8 +203,6 @@ class DrawingWindow(QMainWindow):
         parser = TaskParser(self.task_number)
         parser.createSchema(self.root)
         self.tree_height = self.root.updateTreeHeight(self.tree_height)
-        log(self.root.getChildren())
-        log(self.tree_height)
         self.root.graphTraverse(
             lambda node: node.recalculateNode(
                 self.root, self.height, self.width,

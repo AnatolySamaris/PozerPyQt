@@ -131,5 +131,3 @@ class ModeWindow(QMainWindow):
         else:
             self.parent().set_task_number(-1)
             self.close()
-        
-
