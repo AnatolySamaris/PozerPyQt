@@ -52,6 +52,7 @@ class DrawingWindow(QMainWindow):
         clearFieldAction.triggered.connect(self.clearField)
 
         self.settingCostsAction = QAction("&Задать выигрыши", self)
+        self.settingCostsAction.setText("Задать выигрыши")
         self.settingCostsAction.triggered.connect(self.settingCostsMode)
 
         self.menubar = self.menuBar()
@@ -295,6 +296,13 @@ class DrawingWindow(QMainWindow):
 
     def settingCostsMode(self):
         self.setting_costs_mode = not self.setting_costs_mode
+
+        current_text = self.settingCostsAction.text()
+        if current_text == "Задать выигрыши":
+            self.settingCostsAction.setText("Построить схему")
+        else:
+            self.settingCostsAction.setText("Задать выигрыши")
+        self.settingCostsAction.changed.emit()
 
     def set_task_number(self, num: int):
         self.task_number = num
