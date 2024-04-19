@@ -35,7 +35,7 @@ res = n1.graphTraverse(
 )
 
 height = 1
-height = n4.updateTreeHeight(height, n1)
+height = n1.updateTreeHeight(height)
 print(height)
 
 # print(res.getLevel())
