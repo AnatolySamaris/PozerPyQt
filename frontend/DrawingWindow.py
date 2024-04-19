@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt, QEvent
 from .HelpWindow import HelpWindow
 from .ModeWindow import ModeWindow
 from .AddDialog import AddDialog
+from .SetDialog import SetDialog
 
 from backend.Node import Node
 from backend.TaskParser import TaskParser
