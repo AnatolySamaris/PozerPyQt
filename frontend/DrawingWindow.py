@@ -77,6 +77,7 @@ class DrawingWindow(QMainWindow):
         self.root_y = self.y_paint_zero
 
         self.add_dialog_opened = False
+        self.dialog = None
 
         ##############################
         # === TREE INITIALIZATION ===
@@ -84,6 +85,7 @@ class DrawingWindow(QMainWindow):
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
 
+    
     def resizeEvent(self, event):
         new_size = event.size()
         self.width, self.height = new_size.width(), new_size.height()
@@ -119,16 +121,17 @@ class DrawingWindow(QMainWindow):
         if node_costs:
             text = "(" + str(node_costs[0]) + ";" + str(node_costs[1]) + ")"
             label = QLabel(text, self)
-            label.setFont(QFont("Arial", 12))
+            label.setFont(QFont("Arial", 10))
             if node.getEndNode():
                 label.move(node.getX(), node.getY() + self.node_size // 2)
             else:
-                label.move(node.getX() + self.node_size, node.getY() - self.node_size // 2)
+                label.move(node.getX() + int(self.node_size * 0.75), node.getY() - self.node_size // 2)
             label.show()
     
     def paintEvent(self, event):
         for label in self.findChildren(QLabel):
-            label.deleteLater()
+            if self.dialog and label not in self.dialog.findChildren(QLabel):
+                label.deleteLater()
 
         painter = QPainter(self)
         painter.setFont(QFont('Arial', self.letter_size))
@@ -225,14 +228,38 @@ class DrawingWindow(QMainWindow):
         painter.drawLine(x1, y1, x2, y2)
         painter.drawLine(x2, y2, x3, y3)
         painter.drawLine(x2, y2, x4, y4)
-
+    
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
             if self.add_dialog_opened and not self.dialog.geometry().contains(event.globalPos()):
                 self.dialog.close()
                 self.add_dialog_opened = False
         return super().eventFilter(obj, event)
-
+    
+    def calibrate_dialog_window_pos(self, dialog, node):
+        dialog_x, dialog_y = 0, 0
+        if node.getX() + self.node_size + dialog.width() > self.width:
+            dialog_x = node.getX() - dialog.width()
+        else:
+            dialog_x = node.getX() + self.node_size
+        if node.getY() + self.node_size // 2 + dialog.height() > self.height:
+            dialog_y = node.getY() + self.node_size // 2 - dialog.height()
+        else:
+            dialog_y = node.getY() + self.node_size // 2
+        return dialog_x, dialog_y
+    
+    def create_dialog(self, type: str, current_node: Node):
+        if type == "add":
+            self.dialog = AddDialog(self, current_node)
+        elif type == "set":
+            self.dialog = SetDialog(self, current_node)
+        else:
+            return
+        dialog_x, dialog_y = self.calibrate_dialog_window_pos(self.dialog, current_node)
+        self.dialog.set_position(dialog_x, dialog_y)
+        self.add_dialog_opened = True
+        self.dialog.show()
+    
     def mousePressEvent(self, event):
         if event.button() == 2:  # Правая кнопка мыши
             click_pos = [event.x(), event.y()]
@@ -242,24 +269,10 @@ class DrawingWindow(QMainWindow):
             if clicked_node:
                 if self.setting_costs_mode:
                     if clicked_node.getEndNode() or clicked_node.checkChildrenCosts():
-                        self.dialog = SetDialog(
-                            self,
-                            clicked_node.getX() + self.node_size,
-                            clicked_node.getY() + self.node_size // 2,
-                            clicked_node
-                        )
-                        self.add_dialog_opened = True
-                        self.dialog.show()
+                        self.create_dialog('set', clicked_node)
                 else:
                     if not clicked_node.getEndNode():
-                        self.dialog = AddDialog(
-                            self,
-                            clicked_node.getX() + self.node_size,
-                            clicked_node.getY() + self.node_size // 2,
-                            clicked_node
-                        )
-                        self.add_dialog_opened = True
-                        self.dialog.show()
+                        self.create_dialog('add', clicked_node)
 
     def get_task_tree(self):
         parser = TaskParser(self.task_number)
@@ -275,6 +288,7 @@ class DrawingWindow(QMainWindow):
         parser.setCosts(self.root)
         self.update()
 
+        
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
@@ -292,6 +306,10 @@ class DrawingWindow(QMainWindow):
     def clearField(self):
         self.root.deleteChildren()
         self.tree_height = 1
+        for label in self.findChildren(QLabel):
+            if self.dialog and label in self.dialog.findChildren(QLabel):
+                continue
+            label.deleteLater()
         self.update()
 
     def settingCostsMode(self):

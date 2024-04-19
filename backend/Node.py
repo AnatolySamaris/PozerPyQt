@@ -162,7 +162,7 @@ class Node:
         return treeHeight
     
     def checkChildrenCosts(self):
-        for child in self.getChildren():
+        for child in self.children:
             if not child.getCosts():
                 return False
         return True
