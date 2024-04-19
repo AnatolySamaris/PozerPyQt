@@ -58,6 +58,19 @@ class SetDialog(QDialog):
 
         self.setLayout(layout)
 
+
+    def check_and_set_costs(self):
+        a, b = int(self.input_1.text()), int(self.input_2.text)
+        if a and b:
+            if (a, b) == self.current_node.findBestCosts():
+                self.parent().set_node_cost(self.current_node, (a, b))
+                self.close()
+            else:
+                pass    # Обработка неправильных значений
+        else:
+            pass    # Обработка пустых значений
+
+
 if __name__ == "__main__":
     App = QApplication(sys.argv)
     window = SetDialog(None, 600, 350, None)

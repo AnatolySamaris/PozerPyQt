@@ -11,6 +11,9 @@ from .SetDialog import SetDialog
 from backend.Node import Node
 from backend.TaskParser import TaskParser
 
+from typing import Tuple
+from math import cos, sin, atan2, pi
+
 def log(*args):
     print('=' * 20)
     print(*args, sep=' ')
@@ -91,6 +94,8 @@ class DrawingWindow(QMainWindow):
             )
         )
         self.update()
+        if self.add_dialog_opened:
+            self.dialog.close()
     
     def create_node(self, parent: Node|None, leaf=False):
         if parent is None:
@@ -114,7 +119,7 @@ class DrawingWindow(QMainWindow):
             text = "(" + str(node_costs[0]) + "; " + str(node_costs[1]) + ")"
             label = QLabel(text, self)
             label.setFont(QFont("Arial", 12))
-            label.move(node.getX() + self.node_size, node.getY())
+            label.move(node.getX() + self.node_size, node.getY() - self.node_size // 2)
             label.show()
     
     def paintEvent(self, event):
@@ -166,9 +171,6 @@ class DrawingWindow(QMainWindow):
         if not from_node:
             return
         from_x, from_y = from_node.getPosition()
-        #if to_node.getEndNode():
-        #    to_x, to_y = to_node.getX() + self.node_size, to_node.getY()
-        #else:
         to_x, to_y = to_node.getPosition()
         painter.drawLine(
             from_x + self.node_size // 2,
@@ -176,6 +178,49 @@ class DrawingWindow(QMainWindow):
             to_x + self.node_size // 2,
             to_y
         )
+
+    def set_node_cost(self, node: Node, costs: Tuple[int]):
+        node.setCosts(costs)
+        for label in self.findChildren(QLabel):
+            if (label.x() == node.getX() + self.node_size // 2
+                and label.y() == node.getY() - self.node_size // 2):
+                label.deleteLater()
+                break
+        self.create_cost_label(node)
+
+    def draw_arrow(self, painter: QPainter, from_node: Node, to_node: Node):
+        if not from_node:
+            return
+        pen = QPen(Qt.black, 2, Qt.SolidLine)
+        painter.setPen(pen)
+        painter.setBrush(Qt.black)
+        x1, y1 = from_node.getPosition()
+        x2, y2 = to_node.getPosition()
+        dx = x2 - x1
+        dy = y2 - y1
+        angle = atan2(dy, dx)
+        #headAngle = 15 * pi / 180  # Угол наклона стрелки
+        headAngle = 30 * pi / 180
+        arrowSize = 20
+        # Черчение треугольника
+        x3 = x2 - arrowSize * cos(angle + headAngle)
+        y3 = y2 - arrowSize * sin(angle + headAngle)
+        x4 = x2 - arrowSize * cos(angle - headAngle)
+        y4 = y2 - arrowSize * sin(angle - headAngle)
+
+        x1 = int(x1 + self.node_size // 2)
+        y1 = int(y1 + self.node_size)
+        x2 = int(x2 + self.node_size // 2)
+        y2 = int(y2)
+
+        x3 = int(x3 + self.node_size // 2)
+        x4 = int(x4 + self.node_size // 2)
+        y3 = int(y3)
+        y4 = int(y4)
+
+        painter.drawLine(x1, y1, x2, y2)
+        painter.drawLine(x2, y2, x3, y3)
+        painter.drawLine(x2, y2, x4, y4)
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
@@ -223,8 +268,8 @@ class DrawingWindow(QMainWindow):
                 self.node_size, self.tree_height
             )
         )
+        parser.setCosts(self.root)
         self.update()
-        #parser.setCosts(self.root)
 
     def center(self):
         qr = self.frameGeometry()
