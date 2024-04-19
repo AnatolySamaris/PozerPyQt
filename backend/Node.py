@@ -160,3 +160,9 @@ class Node:
 
         treeHeight = max(treeHeight, recursiveMaxHeight(self))
         return treeHeight
+    
+    def checkChildrenCosts(self):
+        for child in self.getChildren():
+            if not child.getCosts():
+                return False
+        return True

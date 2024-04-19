@@ -47,14 +47,14 @@ class DrawingWindow(QMainWindow):
         clearFieldAction = QAction("&Очистить поле", self)
         clearFieldAction.triggered.connect(self.clearField)
 
-        startSolution = QAction("&Начать решение", self)
-        startSolution.triggered.connect(self.startSolution)
+        self.settingCostsAction = QAction("&Задать выигрыши", self)
+        self.settingCostsAction.triggered.connect(self.settingCostsMode)
 
         self.menubar = self.menuBar()
         self.menubar.addAction(helpAction)
         self.menubar.addAction(modeAction)
         self.menubar.addAction(clearFieldAction)
-        self.menubar.addAction(startSolution)
+        self.menubar.addAction(self.settingCostsAction)
 
         ########################
         # === VARIABLES ===
@@ -66,6 +66,7 @@ class DrawingWindow(QMainWindow):
         self.y_letter_position = int(self.node_size * 0.7)
         self.x_paint_zero = 0
         self.y_paint_zero = 40
+        self.setting_costs_mode = False
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
         self.root_y = self.y_paint_zero
@@ -188,15 +189,27 @@ class DrawingWindow(QMainWindow):
             clicked_node = self.root.graphTraverse(
                 lambda node: node.findNode(click_pos, self.node_size)
             )
-            if clicked_node and not clicked_node.getEndNode():
-                self.dialog = AddDialog(
-                    self,
-                    clicked_node.getX() + self.node_size,
-                    clicked_node.getY() + self.node_size // 2,
-                    clicked_node
-                )
-                self.add_dialog_opened = True
-                self.dialog.show()
+            if clicked_node:
+                if self.setting_costs_mode:
+                    if clicked_node.getEndNode() or clicked_node.checkChildrenCosts():
+                        self.dialog = SetDialog(
+                            self,
+                            clicked_node.getX() + self.node_size,
+                            clicked_node.getY() + self.node_size // 2,
+                            clicked_node
+                        )
+                        self.add_dialog_opened = True
+                        self.dialog.show()
+                else:
+                    if not clicked_node.getEndNode():
+                        self.dialog = AddDialog(
+                            self,
+                            clicked_node.getX() + self.node_size,
+                            clicked_node.getY() + self.node_size // 2,
+                            clicked_node
+                        )
+                        self.add_dialog_opened = True
+                        self.dialog.show()
 
     def get_task_tree(self):
         parser = TaskParser(self.task_number)
@@ -231,8 +244,8 @@ class DrawingWindow(QMainWindow):
         self.tree_height = 1
         self.update()
 
-    def startSolution(self):
-        pass
+    def settingCostsMode(self):
+        self.setting_costs_mode = not self.setting_costs_mode
 
     def set_task_number(self, num: int):
         self.task_number = num
