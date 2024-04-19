@@ -3,11 +3,11 @@ from PyQt5.QtCore import Qt
 import sys
 
 class SetDialog(QDialog):
-    def __init__(self, parent=None, current_node=None):
+    def __init__(self, parent, x: int, y: int, current_node):
         super().__init__(parent)
         self.current_node = current_node
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setGeometry(100, 100, 230, 150)
+        self.setGeometry(x, y, 230, 150)
         self.setStyleSheet("background-color: #e5e5e5; border: 1px solid black;")
 
         layout = QVBoxLayout()
@@ -51,10 +51,10 @@ class SetDialog(QDialog):
         ok_button.setStyleSheet("width: 70px;")
         layout.addWidget(ok_button, alignment=Qt.AlignRight)
 
-        self.setLayout(layout)
+        parent.setLayout(layout)
 
-if __name__ == "__main__":
-    App = QApplication(sys.argv)
-    window = SetDialog()
-    window.show()
-    sys.exit(App.exec())
+# if __name__ == "__main__":
+#     App = QApplication(sys.argv)
+#     window = SetDialog()
+#     window.show()
+#     sys.exit(App.exec())

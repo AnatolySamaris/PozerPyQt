@@ -184,20 +184,48 @@ class DrawingWindow(QMainWindow):
         return super().eventFilter(obj, event)
 
     def mousePressEvent(self, event):
-        if event.button() == 2:  # Правая кнопка мыши
-            click_pos = [event.x(), event.y()]
-            clicked_node = self.root.graphTraverse(
-                lambda node: node.findNode(click_pos, self.node_size)
-            )
-            if clicked_node and not clicked_node.getEndNode():
-                self.dialog = AddDialog(
-                    self,
-                    clicked_node.getX() + self.node_size,
-                    clicked_node.getY() + self.node_size // 2,
-                    clicked_node
+        # if event.button() == 2:  # Правая кнопка мыши
+        #     click_pos = [event.x(), event.y()]
+        #     clicked_node = self.root.graphTraverse(
+        #         lambda node: node.findNode(click_pos, self.node_size)
+        #     )
+        #     if clicked_node and not clicked_node.getEndNode():
+        #         self.dialog = AddDialog(
+        #             self,
+        #             clicked_node.getX() + self.node_size,
+        #             clicked_node.getY() + self.node_size // 2,
+        #             clicked_node
+        #         )
+        #         self.add_dialog_opened = True
+        #         self.dialog.show()
+
+        def mousePressEvent(self, event):
+            if event.button() == 2:  # Правая кнопка мыши
+                click_pos = [event.x(), event.y()]
+                clicked_node = self.root.graphTraverse(
+                    lambda node: node.findNode(click_pos, self.node_size)
                 )
-                self.add_dialog_opened = True
-                self.dialog.show()
+                if clicked_node:
+                    if self.setting_costs_mode:
+                        if clicked_node.getEndNode() or clicked_node.checkChildrenCosts():
+                            self.dialog = SetDialog(
+                                self,
+                                clicked_node.getX() + self.node_size,
+                                clicked_node.getY() + self.node_size // 2,
+                                clicked_node
+                            )
+                            self.add_dialog_opened = True
+                            self.dialog.show()
+                    else:
+                        if not clicked_node.getEndNode():
+                            self.dialog = AddDialog(
+                                self,
+                                clicked_node.getX() + self.node_size,
+                                clicked_node.getY() + self.node_size // 2,
+                                clicked_node
+                            )
+                            self.add_dialog_opened = True
+                            self.dialog.show()
 
     def get_task_tree(self):
         parser = TaskParser(self.task_number)
