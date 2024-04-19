@@ -1,28 +1,32 @@
-from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QPainter, QColor, QBrush
-from PyQt5.QtCore import Qt
-
+import sys
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget
 
 class MyWidget(QWidget):
-    def paintEvent(self, event):
-        qp = QPainter()
-        qp.begin(self)
+    def __init__(self):
+        super().__init__()
 
-        # Рисуем закрашенный черный кружок
-        qp.setBrush(QColor(0, 0, 0))  # Черный цвет
-        qp.setPen(Qt.NoPen)  # Убираем обводку
-        qp.drawEllipse(50, 50, 100, 100)
+        # Создаем объекты QLabel и задаем им текст и координаты
+        self.labels = [
+            {'text': 'Label 1', 'x': 100, 'y': 100},
+            {'text': 'Label 2', 'x': 200, 'y': 200},
+            {'text': 'Label 3', 'x': 300, 'y': 300},
+            {'text': 'Label 4', 'x': 400, 'y': 400}
+        ]
 
-        # Рисуем незакрашенный кружок
-        qp.setBrush(Qt.NoBrush)  # Убираем закрашивание
-        qp.setPen(QColor(0, 0, 0))  # Черный цвет обводки
-        qp.drawEllipse(200, 50, 100, 100)
+        self.set_labels()
 
-        qp.end()
+        self.setGeometry(100, 100, 600, 600)
+        self.setWindowTitle('Labels')
+        self.show()
 
+    def set_labels(self):
+        for label_data in self.labels:
+            label = QLabel(self)
+            label.setText(label_data['text'])
+            label.move(label_data['x'], label_data['y'])
+            label.show()
 
 if __name__ == '__main__':
-    app = QApplication([])
-    window = MyWidget()
-    window.show()
-    app.exec_()
+    app = QApplication(sys.argv)
+    widget = MyWidget()
+    sys.exit(app.exec_())

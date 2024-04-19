@@ -22,8 +22,7 @@ class AddDialog(QDialog):
     def add_child(self):
         self.parent().create_node(self.current_node)
         self.parent().update()
-        
-    
+
     def add_leaf(self):
         self.parent().create_node(self.current_node, leaf=True)
         self.parent().update()
