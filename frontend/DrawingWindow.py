@@ -116,10 +116,13 @@ class DrawingWindow(QMainWindow):
     def create_cost_label(self, node: Node):
         node_costs = node.getCosts()
         if node_costs:
-            text = "(" + str(node_costs[0]) + "; " + str(node_costs[1]) + ")"
+            text = "(" + str(node_costs[0]) + ";" + str(node_costs[1]) + ")"
             label = QLabel(text, self)
             label.setFont(QFont("Arial", 12))
-            label.move(node.getX() + self.node_size, node.getY() - self.node_size // 2)
+            if node.getEndNode():
+                label.move(node.getX(), node.getY() + self.node_size // 2)
+            else:
+                label.move(node.getX() + self.node_size, node.getY() - self.node_size // 2)
             label.show()
     
     def paintEvent(self, event):
