@@ -173,6 +173,9 @@ class DrawingWindow(QMainWindow):
         self.root.graphTraverse(
             lambda node: self.create_cost_label(node)
         )
+        self.root.graphTraverse(
+            lambda node: self.draw_arrow(node.getParent(), node)
+        )
 
     def connect_nodes(self, painter: QPainter, from_node: Node, to_node: Node):
         if not from_node:
@@ -195,39 +198,44 @@ class DrawingWindow(QMainWindow):
                 break
         self.create_cost_label(node)
 
-    def draw_arrow(self, painter: QPainter, from_node: Node, to_node: Node):
+    def draw_arrow(self, from_node: Node, to_node: Node):
         if not from_node:
             return
-        pen = QPen(Qt.black, 2, Qt.SolidLine)
-        painter.setPen(pen)
-        painter.setBrush(Qt.black)
-        x1, y1 = from_node.getPosition()
-        x2, y2 = to_node.getPosition()
-        dx = x2 - x1
-        dy = y2 - y1
-        angle = atan2(dy, dx)
-        #headAngle = 15 * pi / 180  # Угол наклона стрелки
-        headAngle = 30 * pi / 180
-        arrowSize = 20
-        # Черчение треугольника
-        x3 = x2 - arrowSize * cos(angle + headAngle)
-        y3 = y2 - arrowSize * sin(angle + headAngle)
-        x4 = x2 - arrowSize * cos(angle - headAngle)
-        y4 = y2 - arrowSize * sin(angle - headAngle)
+        from_costs = from_node.getCosts()
+        to_costs = to_node.getCosts()
+        if from_costs and to_costs and from_costs == to_costs:
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.Antialiasing, True)
+            painter.setPen(QPen(Qt.black, 2, Qt.SolidLine))
+            painter.setBrush(Qt.black)
+            x1, y1 = from_node.getPosition()
+            x2, y2 = to_node.getPosition()
+            dx = x2 - x1
+            dy = y2 - y1
+            angle = atan2(dy, dx)
+            #headAngle = 15 * pi / 180  # Угол наклона стрелки
+            headAngle = 30 * pi / 180
+            arrowSize = 20
+            # Черчение треугольника
+            x3 = x2 - arrowSize * cos(angle + headAngle)
+            y3 = y2 - arrowSize * sin(angle + headAngle)
+            x4 = x2 - arrowSize * cos(angle - headAngle)
+            y4 = y2 - arrowSize * sin(angle - headAngle)
 
-        x1 = int(x1 + self.node_size // 2)
-        y1 = int(y1 + self.node_size)
-        x2 = int(x2 + self.node_size // 2)
-        y2 = int(y2)
+            x1 = int(x1 + self.node_size // 2)
+            y1 = int(y1 + self.node_size)
+            x2 = int(x2 + self.node_size // 2)
+            y2 = int(y2)
 
-        x3 = int(x3 + self.node_size // 2)
-        x4 = int(x4 + self.node_size // 2)
-        y3 = int(y3)
-        y4 = int(y4)
+            x3 = int(x3 + self.node_size // 2)
+            x4 = int(x4 + self.node_size // 2)
+            y3 = int(y3)
+            y4 = int(y4)
 
-        painter.drawLine(x1, y1, x2, y2)
-        painter.drawLine(x2, y2, x3, y3)
-        painter.drawLine(x2, y2, x4, y4)
+            painter.drawLine(x1, y1, x2, y2)
+            painter.drawLine(x2, y2, x3, y3)
+            painter.drawLine(x2, y2, x4, y4)
+            painter.end()
     
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:

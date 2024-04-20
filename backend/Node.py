@@ -166,3 +166,9 @@ class Node:
             if not child.getCosts():
                 return False
         return True
+    
+    def findChildByCosts(self, costs):
+        for child in self.children:
+            if child.getCosts() == costs:
+                return child
+        return None

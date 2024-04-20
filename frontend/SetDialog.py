@@ -144,11 +144,15 @@ class SetDialog(QtWidgets.QDialog):
 
     def check_and_set_costs(self):
         a, b = int(self.lineEdit.text()), int(self.lineEdit_2.text())
-        if a and b:
+        if a is not None and b is not None:
             if (not self.current_node.getChildren()
                 or not self.current_node.checkChildrenCosts()
                 or (a, b) == self.current_node.findBestCosts()):
                 self.parent().set_node_cost(self.current_node, (a, b))
+                self.parent().update()
+                #correct_child = self.current_node.findChildByCosts((a, b))
+                #if correct_child:
+                #    self.parent().draw_arrow(self.current_node, correct_child)
                 self.close()
             else:
                 pass    # Обработка неправильных значений
