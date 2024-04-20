@@ -123,6 +123,7 @@ class SetDialog(QtWidgets.QDialog):
 
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setModal(True)
 
         self.label.setText("Введите выигрыши:")
         self.label_2.setText("(")

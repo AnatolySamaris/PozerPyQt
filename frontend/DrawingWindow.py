@@ -96,9 +96,14 @@ class DrawingWindow(QMainWindow):
                 self.node_size, self.tree_height
             )
         )
-        self.update()
+        for label in self.findChildren(QLabel):
+            if self.dialog and label in self.dialog.findChildren(QLabel):
+                continue
+            label.deleteLater()
         if self.add_dialog_opened:
+            log('IM HERE')
             self.dialog.close()
+        self.update()
     
     def create_node(self, parent: Node|None, leaf=False):
         if parent is None:
@@ -137,7 +142,7 @@ class DrawingWindow(QMainWindow):
         painter.setFont(QFont('Arial', self.letter_size))
         painter.setPen(QPen(QColor(Qt.black), 2))
         painter.setRenderHint(QPainter.Antialiasing, True)
-
+        #log('PAINT')
         self.draw_tree(painter)
 
         painter.end()
@@ -254,6 +259,7 @@ class DrawingWindow(QMainWindow):
         if event.type() == QEvent.MouseButtonPress:
             if self.add_dialog_opened and not self.dialog.geometry().contains(event.globalPos()):
                 self.dialog.close()
+                self.dialog = None
                 self.add_dialog_opened = False
         return super().eventFilter(obj, event)
     
@@ -270,6 +276,8 @@ class DrawingWindow(QMainWindow):
         return dialog_x, dialog_y
     
     def create_dialog(self, type: str, current_node: Node):
+        if self.dialog:
+            return
         if type == "add":
             self.dialog = AddDialog(self, current_node)
         elif type == "set":
@@ -279,6 +287,7 @@ class DrawingWindow(QMainWindow):
         dialog_x, dialog_y = self.calibrate_dialog_window_pos(self.dialog, current_node)
         self.dialog.set_position(dialog_x, dialog_y)
         self.add_dialog_opened = True
+        self.dialog.raise_()
         self.dialog.show()
     
     def mousePressEvent(self, event):
@@ -346,3 +355,8 @@ class DrawingWindow(QMainWindow):
 
     def set_task_number(self, num: int):
         self.task_number = num
+
+    def remove_dialog(self):
+        log(self.dialog)
+        self.dialog = None
+        log(self.dialog)
