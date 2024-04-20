@@ -176,6 +176,8 @@ class DrawingWindow(QMainWindow):
         self.root.graphTraverse(
             lambda node: self.draw_arrow(node.getParent(), node)
         )
+        if self.root.getCosts():
+            self.draw_completed_task(self.root)
 
     def connect_nodes(self, painter: QPainter, from_node: Node, to_node: Node):
         if not from_node:
@@ -198,7 +200,15 @@ class DrawingWindow(QMainWindow):
                 break
         self.create_cost_label(node)
 
-    def draw_arrow(self, from_node: Node, to_node: Node):
+    def draw_completed_task(self, node: Node):
+        node_costs = node.getCosts()
+        for child in node.getChildren():
+            if child.getCosts() == node_costs:
+                self.draw_arrow(node, child, task_completed=True)
+                self.draw_completed_task(child)
+        
+
+    def draw_arrow(self, from_node: Node, to_node: Node, task_completed=False):
         if not from_node:
             return
         from_costs = from_node.getCosts()
@@ -206,7 +216,10 @@ class DrawingWindow(QMainWindow):
         if from_costs and to_costs and from_costs == to_costs:
             painter = QPainter(self)
             painter.setRenderHint(QPainter.Antialiasing, True)
-            painter.setPen(QPen(Qt.black, 2, Qt.SolidLine))
+            if task_completed:
+                painter.setPen(QPen(Qt.black, 4, Qt.SolidLine))
+            else:
+                painter.setPen(QPen(Qt.black, 2, Qt.SolidLine))
             painter.setBrush(Qt.black)
             x1, y1 = from_node.getPosition()
             x2, y2 = to_node.getPosition()
