@@ -150,9 +150,6 @@ class SetDialog(QtWidgets.QDialog):
                 or (a, b) == self.current_node.findBestCosts()):
                 self.parent().set_node_cost(self.current_node, (a, b))
                 self.parent().update()
-                #correct_child = self.current_node.findChildByCosts((a, b))
-                #if correct_child:
-                #    self.parent().draw_arrow(self.current_node, correct_child)
                 self.close()
             else:
                 pass    # Обработка неправильных значений

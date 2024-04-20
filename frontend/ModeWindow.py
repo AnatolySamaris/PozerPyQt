@@ -15,7 +15,7 @@ class ModeWindow(QMainWindow):
         super().__init__(parent)
         self.setObjectName("MainWindow")
         self.setWindowTitle("Режим ввода")
-        self.setGeometry(300, 300, 320, 180)
+        self.setFixedSize(320, 180)
         font = QFont()
         font.setPointSize(10)
         self.center()
