@@ -326,6 +326,7 @@ class DrawingWindow(QMainWindow):
 
     def clearField(self):
         self.root.deleteChildren()
+        self.root.setCosts(())
         self.tree_height = 1
         for label in self.findChildren(QLabel):
             if self.dialog and label in self.dialog.findChildren(QLabel):
@@ -345,6 +346,3 @@ class DrawingWindow(QMainWindow):
 
     def set_task_number(self, num: int):
         self.task_number = num
-
-    def redraw(self):
-        self.update()
