@@ -84,7 +84,8 @@ class Node:
         tempChildren.sort(
             key=lambda x: x.costs[label]
         )
-        return tempChildren[len(tempChildren) - 1].costs
+        best_cost = tempChildren[len(tempChildren) - 1].costs[label]
+        return [child.costs for child in tempChildren if child.costs[label] == best_cost]
     
 
     # рекурсивная функция обхода графа, вызывающая некоторую

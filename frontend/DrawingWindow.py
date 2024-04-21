@@ -70,7 +70,7 @@ class DrawingWindow(QMainWindow):
         self.x_letter_position = int(self.node_size * 0.3)
         self.y_letter_position = int(self.node_size * 0.7)
         self.x_paint_zero = 0
-        self.y_paint_zero = 40
+        self.y_paint_zero = 50
         self.setting_costs_mode = False
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
@@ -78,7 +78,6 @@ class DrawingWindow(QMainWindow):
 
         self.add_dialog_opened = False
         self.dialog = None
-        self.labels = []
 
         ##############################
         # === TREE INITIALIZATION ===
@@ -100,10 +99,6 @@ class DrawingWindow(QMainWindow):
         if self.add_dialog_opened:
             self.dialog = None
             self.dialog.close()
-        #for label in self.findChildren(QLabel):
-        #    if self.dialog and label in self.dialog.findChildren(QLabel):
-        #        continue
-        #    label.deleteLater()
         self.update()
     
     def create_node(self, parent: Node|None, leaf=False):
@@ -122,21 +117,6 @@ class DrawingWindow(QMainWindow):
             )
         )
     
-    '''
-    def create_cost_label(self, node: Node):
-        node_costs = node.getCosts()
-        if node_costs:
-            text = "(" + str(node_costs[0]) + ";" + str(node_costs[1]) + ")"
-            label = QLabel(text, self)
-            label.setFont(QFont("Arial", 10))
-            if node.getEndNode():
-                label.move(node.getX(), node.getY() + self.node_size // 2)
-            else:
-                label.move(node.getX() + int(self.node_size * 0.75), node.getY() - self.node_size // 2)
-            self.labels.append(label)
-            label.setVisible(True)
-            #label.show()
-    '''
     def create_cost_label(self, painter, node: Node):
         node_costs = node.getCosts()
         if node_costs:
@@ -149,9 +129,6 @@ class DrawingWindow(QMainWindow):
             painter.setFont(QFont('Arial', self.letter_size))
     
     def paintEvent(self, event):
-        #for label in self.findChildren(QLabel):
-        #    if self.dialog and label not in self.dialog.findChildren(QLabel):
-        #        label.deleteLater()
         painter = QPainter(self)
         painter.setFont(QFont('Arial', self.letter_size))
         painter.setPen(QPen(QColor(Qt.black), 2))
@@ -205,22 +182,13 @@ class DrawingWindow(QMainWindow):
             to_y
         )
 
-    def set_node_cost(self, node: Node, costs: Tuple[int]):
-        node.setCosts(costs)
-        
-        #for label in self.findChildren(QLabel):
-        #    if (label.x() == node.getX() + self.node_size // 2
-        #        and label.y() == node.getY() - self.node_size // 2):
-        #        label.deleteLater()
-        #        break
-        #self.create_cost_label(node)
-
     def draw_completed_task(self, node: Node):
         node_costs = node.getCosts()
         for child in node.getChildren():
             if child.getCosts() == node_costs:
                 self.draw_arrow(node, child, task_completed=True)
                 self.draw_completed_task(child)
+                break
         
 
     def draw_arrow(self, from_node: Node, to_node: Node, task_completed=False):
@@ -229,6 +197,12 @@ class DrawingWindow(QMainWindow):
         from_costs = from_node.getCosts()
         to_costs = to_node.getCosts()
         if from_costs and to_costs and from_costs == to_costs:
+            count_costs = {}
+            for child in from_node.getChildren():
+                count_costs[child.getCosts()] = [child] + count_costs.get(child.getCosts(), [])
+            if len(count_costs[to_costs]) > 1:
+                to_node = count_costs[to_costs][-1]
+            
             painter = QPainter(self)
             painter.setRenderHint(QPainter.Antialiasing, True)
             if task_completed:
@@ -346,10 +320,6 @@ class DrawingWindow(QMainWindow):
         self.root.deleteChildren()
         self.root.setCosts(())
         self.tree_height = 1
-        #for label in self.findChildren(QLabel):
-        #    if self.dialog and label in self.dialog.findChildren(QLabel):
-        #        continue
-        #    label.deleteLater()
         self.update()
 
     def settingCostsMode(self):
@@ -365,7 +335,5 @@ class DrawingWindow(QMainWindow):
     def set_task_number(self, num: int):
         self.task_number = num
 
-    def remove_dialog(self):
-        log(self.dialog)
-        self.dialog = None
-        log(self.dialog)
+    def set_node_cost(self, node: Node, costs: Tuple[int]):
+        node.setCosts(costs)

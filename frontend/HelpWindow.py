@@ -7,7 +7,7 @@ class HelpWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Справка")
-        self.setFixedSize(670, 500)
+        self.setFixedSize(800, 500)
         self.center()
 
         font = QFont()
