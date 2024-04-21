@@ -19,9 +19,9 @@ class SetDialog(QtWidgets.QDialog):
         self.setMinimumSize(QtCore.QSize(230, 150))
         self.setMaximumSize(QtCore.QSize(230, 150))
         self.setStyleSheet("QDialog {\n"
-"    background-color: #e5e5e5;\n"
-"    border: 1px solid black;\n"
-"}")
+        "    background-color: #e5e5e5;\n"
+        "    border: 1px solid black;\n"
+        "}")
         self.current_node = current_node
         self.int_validator = QtGui.QIntValidator(-1000, 1000, self)
         font = QtGui.QFont()
