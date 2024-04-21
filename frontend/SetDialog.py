@@ -157,11 +157,3 @@ class SetDialog(QtWidgets.QDialog):
                 self.set_error()
         else:
             self.set_error()
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    dialog = SetDialog()
-    dialog.show()
-    sys.exit(app.exec())
