@@ -149,7 +149,7 @@ class SetDialog(QtWidgets.QDialog):
             a, b = int(a), int(b)
             if (not self.current_node.getChildren()
                 or not self.current_node.checkChildrenCosts()
-                or (a, b) == self.current_node.findBestCosts()):
+                or (a, b) in self.current_node.findBestCosts()):
                 self.parent().set_node_cost(self.current_node, (a, b))
                 self.parent().update()
                 self.close()
