@@ -70,7 +70,7 @@ class DrawingWindow(QMainWindow):
         self.x_letter_position = int(self.node_size * 0.3)
         self.y_letter_position = int(self.node_size * 0.7)
         self.x_paint_zero = 0
-        self.y_paint_zero = 40
+        self.y_paint_zero = 50
         self.setting_costs_mode = False
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
