@@ -124,6 +124,8 @@ class SetDialog(QDialog):
         self.pushButton.setLayoutDirection(Qt.LeftToRight)
         self.pushButton.setObjectName("pushButton")
         self.pushButton.pressed.connect(self.check_and_set_costs)
+        self.lineEdit.editingFinished.connect(self.change_costs)
+        self.lineEdit_2.editingFinished.connect(self.change_costs)
         self.horizontalLayout_2.addWidget(self.pushButton)
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -156,24 +158,40 @@ class SetDialog(QDialog):
         elif event.key() == Qt.Key_Escape:
             self.close()
 
-    def set_error_a(self):
-        style1 = 'background-color:  #d9746c;'
-        style2 = 'background-color:  #ffffff;'
-        self.lineEdit.setStyleSheet(style1)
-        self.lineEdit_2.setStyleSheet(style2)
+    def change_costs(self):
+        a, b = self.lineEdit.text(), self.lineEdit_2.text()
+        # if self.lineEdit.textChanged() or self.lineEdit_2.textChanged():
+        if (not self.current_node.getChildren()
+                or not self.current_node.checkChildrenCosts()
+                or (a, b) in self.current_node.findBestCosts()):
+            pass
+        else:
+            if (a != '' and any(tup[0] == int(a) for tup in self.current_node.findBestCosts())):
+                self.lineEdit.setStyleSheet('background-color:  #ffffff;')
+            elif (a != '' and any(int(tup[0]) != int(a)  for tup in self.current_node.findBestCosts())):
+                self.lineEdit.setStyleSheet('background-color:  #d9746c;')
+            if (b != '' and any(tup[1] == int(b) for tup in self.current_node.findBestCosts())):
+                self.lineEdit_2.setStyleSheet('background-color:  #ffffff;')
+            elif (b != '' and any(int(tup[1]) != int(b) for tup in self.current_node.findBestCosts())):
+                self.lineEdit_2.setStyleSheet('background-color:  #d9746c;')
+    
+    # def set_error_a(self):
+    #     style1 = 'background-color:  #d9746c;'
+    #     style2 = 'background-color:  #ffffff;'
+    #     self.lineEdit.setStyleSheet(style1)
+    #     self.lineEdit_2.setStyleSheet(style2)
         
-    def set_error_b(self):
-        style1 = 'background-color:  #d9746c;'
-        style2 = 'background-color:  #ffffff;'
-        self.lineEdit.setStyleSheet(style2)
-        self.lineEdit_2.setStyleSheet(style1)
+    # def set_error_b(self):
+    #     style1 = 'background-color:  #d9746c;'
+    #     style2 = 'background-color:  #ffffff;'
+    #     self.lineEdit.setStyleSheet(style2)
+    #     self.lineEdit_2.setStyleSheet(style1)
 
-    def set_error_both(self):
-        style = 'background-color:  #d9746c;'
-        self.lineEdit.setStyleSheet(style)
-        self.lineEdit_2.setStyleSheet(style)
+    # def set_error_both(self):
+    #     style = 'background-color:  #d9746c;'
+    #     self.lineEdit.setStyleSheet(style)
+    #     self.lineEdit_2.setStyleSheet(style)
 
-    #
     def check_and_set_costs(self):
         a, b = self.lineEdit.text(), self.lineEdit_2.text()
         if a != '' and b != '':
@@ -184,12 +202,14 @@ class SetDialog(QDialog):
                     self.parent().set_node_cost(self.current_node, (a, b))
                     self.parent().update()
                     self.close()
-            elif (any(tup[0] != a for tup in self.current_node.findBestCosts())) and (any(tup[1] == b for tup in self.current_node.findBestCosts())):
-                self.set_error_a()
-            elif (any(tup[1] != b for tup in self.current_node.findBestCosts())) and (any(tup[0] == a for tup in self.current_node.findBestCosts())):
-                self.set_error_b()
-            else:
-                self.set_error_both()
+            # elif (any(tup[0] != a for tup in self.current_node.findBestCosts())) and (any(tup[1] == b for tup in self.current_node.findBestCosts())):
+            #     self.set_error_a()
+            # elif (any(tup[1] != b for tup in self.current_node.findBestCosts())) and (any(tup[0] == a for tup in self.current_node.findBestCosts())):
+            #     self.set_error_b()
+            # else:
+            #     self.set_error_both()
+            # else:
+            #     self.change_costs(a, b)
         elif a == '' and b != '':
             self.set_error_a()
         elif a != '' and b == '':
