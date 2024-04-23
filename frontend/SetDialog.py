@@ -166,6 +166,7 @@ class SetDialog(QDialog):
         self.lineEdit.setStyleSheet(style)
         self.lineEdit_2.setStyleSheet(style)
 
+    #
     def check_and_set_costs(self):
         a, b = self.lineEdit.text(), self.lineEdit_2.text()
         if a != '' and b != '':
