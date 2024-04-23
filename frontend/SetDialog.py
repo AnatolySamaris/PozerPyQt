@@ -149,8 +149,20 @@ class SetDialog(QDialog):
         if event.key() == 16777220:  # Key code for Enter key
             self.check_and_set_costs()
 
-    def set_error(self):
-        style = 'border: 1px solid red;'
+    def set_error_a(self):
+        style1 = 'background-color:  #d9746c;'
+        style2 = 'background-color:  #ffffff;'
+        self.lineEdit.setStyleSheet(style1)
+        self.lineEdit_2.setStyleSheet(style2)
+        
+    def set_error_b(self):
+        style1 = 'background-color:  #d9746c;'
+        style2 = 'background-color:  #ffffff;'
+        self.lineEdit.setStyleSheet(style2)
+        self.lineEdit_2.setStyleSheet(style1)
+
+    def set_error_both(self):
+        style = 'background-color:  #d9746c;'
         self.lineEdit.setStyleSheet(style)
         self.lineEdit_2.setStyleSheet(style)
 
@@ -161,10 +173,18 @@ class SetDialog(QDialog):
             if (not self.current_node.getChildren()
                 or not self.current_node.checkChildrenCosts()
                 or (a, b) in self.current_node.findBestCosts()):
-                self.parent().set_node_cost(self.current_node, (a, b))
-                self.parent().update()
-                self.close()
+                    self.parent().set_node_cost(self.current_node, (a, b))
+                    self.parent().update()
+                    self.close()
+            elif (any(tup[0] != a for tup in self.current_node.findBestCosts())) and (any(tup[1] == b for tup in self.current_node.findBestCosts())):
+                self.set_error_a()
+            elif (any(tup[1] != b for tup in self.current_node.findBestCosts())) and (any(tup[0] == a for tup in self.current_node.findBestCosts())):
+                self.set_error_b()
             else:
-                self.set_error()
+                self.set_error_both()
+        elif a == '' and b != '':
+            self.set_error_a()
+        elif a != '' and b == '':
+            self.set_error_b()
         else:
-            self.set_error()
+            self.set_error_both()
