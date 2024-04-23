@@ -12,7 +12,7 @@ from backend.Node import Node
 from backend.TaskParser import TaskParser
 
 from typing import Tuple
-from math import cos, sin, atan2, pi
+from math import sqrt, pi
 
 def log(*args):
     print('=' * 20)
@@ -30,8 +30,8 @@ class DrawingWindow(QMainWindow):
         self.title = "Позиционные игры"
         self.top= 150
         self.left= 150
-        self.width = 1500
-        self.height = 800
+        self.width = 1800
+        self.height = 900
 
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
@@ -86,12 +86,6 @@ class DrawingWindow(QMainWindow):
         ##############################
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
-
-        #c = Node(2, self.root, endNode=True)
-        #self.root.setCosts((1, 1))
-        #c.setCosts((1, 1))
-        #self.root.addChild(c)
-        
 
     
     def resizeEvent(self, event):
@@ -219,7 +213,6 @@ class DrawingWindow(QMainWindow):
                 painter.setPen(QPen(Qt.black, 2, Qt.SolidLine))
             painter.setBrush(Qt.black)
 
-
             x1, y1 = from_node.getPosition()
             x2, y2 = to_node.getPosition()
 
@@ -228,49 +221,18 @@ class DrawingWindow(QMainWindow):
             x2 = int(x2 + self.node_size // 2)
             y2 = int(y2)
 
-            dx, dy = x1 - x2, y1 - y2   # Берем обратный вектор
+            dx, dy = x2 - x1, y2 - y1
 
-            angle = pi / 10  # 18 градусов
+            l = (dx / sqrt(dx**2 + dy**2), dy / sqrt(dx**2 + dy**2))
+            n = (-l[1], l[0])
 
-            x3 = int(dx * cos(angle) - dy * sin(angle) + to_node.getX())
-            y3 = int(dx * sin(angle) + dy * cos(angle) + to_node.getY())
+            w = 10
+            h = 25
 
-            x4 = int(dx * cos(-angle) - dy * sin(-angle) + to_node.getX())
-            y4 = int(dx * sin(-angle) + dy * cos(-angle) + to_node.getY())
-
-
-            from math import sqrt
-
-            #len3 = sqrt(x3 ** 2 + y3 ** 2)
-            #len4 = sqrt(x4 ** 2 + y4 ** 2)
-
-            #x3 = int(x3 * self.arrow_size / len3 + to_node.getX())
-            #y3 = int(y3 * self.arrow_size / len3 + to_node.getY())
-            #x4 = int(x4 * self.arrow_size / len4 + to_node.getX())
-            #y4 = int(y4 * self.arrow_size / len4 + to_node.getY())
-
-            a_size = sqrt(dx ** 2 + dy ** 2)
-            koef = 1 / a_size
-            a_new1 = [koef * (x3  - x2) * self.arrow_size, koef * (y3 - y2)* self.arrow_size]
-            a_new2 = [koef * (x4 - x2)* self.arrow_size, koef * (y4 - y2)* self.arrow_size]
-
-            # a_new_len = sqrt(a_new2[0]**2 + a_new2[1]**2)
-
-            x3 = int(x2 + a_new1[0])
-            y3 = int(y2 + a_new1[1])
-            x4 = int(x2 + a_new2[0])
-            y4 = int(y2 + a_new2[1])
-            # x3 = int(x2 + a_new2[0] + 2 * a_new_len * sin(angle)**2)
-            # y3 = int(y2 + a_new2[1] + 2 * a_new_len * sin(angle) * cos(angle))
-            # x4 = int(x3 - 2 * a_new_len * sin(angle)**2)
-            # y4 = int(x4 - 2 * a_new_len * sin(angle) * cos(angle))
-            
-
-            #x3 = int(x3 + self.node_size // 2)
-            #x4 = int(x4 + self.node_size // 2)
-            #y3 = int(y3)
-            #y4 = int(y4)
-
+            x3 = int(x2 - h * l[0] + w * n[0])
+            y3 = int(y2 - h * l[1] + w * n[1])
+            x4 = int(x2 - h * l[0] - w * n[0])
+            y4 = int(y2 - h * l[1] - w * n[1])
 
             painter.drawLine(x1, y1, x2, y2)
             painter.drawLine(x2, y2, x3, y3)
