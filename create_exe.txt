@@ -1,1 +1,0 @@
-pyinstaller --onefile --noconsole --noconfirm --upx-dir=upx-4.2.3-win64  main.py
