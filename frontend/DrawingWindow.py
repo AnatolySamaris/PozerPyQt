@@ -300,6 +300,7 @@ class DrawingWindow(QMainWindow):
             self.dialog = SetDialog(self, current_node)
         else:
             return
+
         dialog_x, dialog_y = self.calibrate_dialog_window_pos(self.dialog, current_node)
         self.dialog.set_position(dialog_x, dialog_y)
         self.add_dialog_opened = True
