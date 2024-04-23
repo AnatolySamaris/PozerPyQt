@@ -35,6 +35,7 @@ class DrawingWindow(QMainWindow):
 
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowMaximizeButtonHint)
         self.center()
 
         self.installEventFilter(self)
