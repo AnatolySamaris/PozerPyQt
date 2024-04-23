@@ -138,6 +138,7 @@ class SetDialog(QDialog):
         self.label_4.setText(")")
         self.pushButton.setText("OK")
 
+        self.lineEdit.setFocus()
         QMetaObject.connectSlotsByName(self)
 
     def set_position(self, x: int, y: int):
@@ -146,8 +147,14 @@ class SetDialog(QDialog):
         self.move(x, y)
 
     def keyPressEvent(self, event):
-        if event.key() == 16777220:  # Key code for Enter key
+        if event.key() == Qt.Key_Return:
             self.check_and_set_costs()
+        elif event.key() == Qt.Key_Up:
+            self.lineEdit_2.setFocus()
+        elif event.key() == Qt.Key_Down:
+            self.lineEdit.setFocus()
+        elif event.key() == Qt.Key_Escape:
+            self.close()
 
     def set_error(self):
         style = 'border: 1px solid red;'
