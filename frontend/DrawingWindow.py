@@ -230,7 +230,7 @@ class DrawingWindow(QMainWindow):
 
             dx, dy = x1 - x2, y1 - y2   # Берем обратный вектор
 
-            angle = pi / 18  # 45 градусов
+            angle = pi / 10  # 18 градусов
 
             x3 = int(dx * cos(angle) - dy * sin(angle) + to_node.getX())
             y3 = int(dx * sin(angle) + dy * cos(angle) + to_node.getY())
@@ -254,10 +254,16 @@ class DrawingWindow(QMainWindow):
             a_new1 = [koef * (x3  - x2) * self.arrow_size, koef * (y3 - y2)* self.arrow_size]
             a_new2 = [koef * (x4 - x2)* self.arrow_size, koef * (y4 - y2)* self.arrow_size]
 
+            # a_new_len = sqrt(a_new2[0]**2 + a_new2[1]**2)
+
             x3 = int(x2 + a_new1[0])
             y3 = int(y2 + a_new1[1])
             x4 = int(x2 + a_new2[0])
             y4 = int(y2 + a_new2[1])
+            # x3 = int(x2 + a_new2[0] + 2 * a_new_len * sin(angle)**2)
+            # y3 = int(y2 + a_new2[1] + 2 * a_new_len * sin(angle) * cos(angle))
+            # x4 = int(x3 - 2 * a_new_len * sin(angle)**2)
+            # y4 = int(x4 - 2 * a_new_len * sin(angle) * cos(angle))
             
 
             #x3 = int(x3 + self.node_size // 2)

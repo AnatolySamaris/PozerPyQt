@@ -101,9 +101,11 @@ class ModeWindow(QMainWindow):
         if event.key() == Qt.Key_Return:
             self.handle_mode()
         elif event.key() == Qt.Key_Up:
-            self.lineEdit.setDisabled(False)
+            # self.lineEdit.setDisabled(False)
+            self.radioButton.setFocus()
         elif event.key() == Qt.Key_Down:
-            self.lineEdit.setDisabled(True)
+            # self.lineEdit.setDisabled(True)
+            self.radioButton_2.setFocus()
 
     def change_mode(self):
         if self.radioButton.isChecked():
