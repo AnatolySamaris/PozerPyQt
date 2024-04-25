@@ -15,7 +15,7 @@ class AddDialog(QDialog):
         btn_add_leaf = QPushButton('Добавить исход', self)
         btn_add_leaf.setGeometry(10, 50, 150, 30)
 
-        btn_remove_child = QPushButton('Удалить потомка', self)
+        btn_remove_child = QPushButton('Удалить вершину', self)
         btn_remove_child.setGeometry(10, 90, 150, 30)
 
         if not self.current_node.getEndNode():
