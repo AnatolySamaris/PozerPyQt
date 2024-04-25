@@ -226,8 +226,8 @@ class DrawingWindow(QMainWindow):
             l = (dx / sqrt(dx**2 + dy**2), dy / sqrt(dx**2 + dy**2))
             n = (-l[1], l[0])
 
-            w = 10
-            h = 25
+            w = 5
+            h = 12
 
             x3 = int(x2 - h * l[0] + w * n[0])
             y3 = int(y2 - h * l[1] + w * n[1])
@@ -249,6 +249,8 @@ class DrawingWindow(QMainWindow):
     
     def calibrate_dialog_window_pos(self, dialog, node):
         dialog_x, dialog_y = 0, 0
+
+        # Калибруем по границам главного окна
         if node.getX() + self.node_size + dialog.width() > self.width:
             dialog_x = node.getX() - dialog.width()
         else:
@@ -257,6 +259,12 @@ class DrawingWindow(QMainWindow):
             dialog_y = node.getY() + self.node_size // 2
         else:
             dialog_y = node.getY() + self.node_size // 2 - dialog.height()
+
+        # Калибруем по типу ноды
+        if node.getEndNode():
+            dialog_x -= self.node_size // 4
+            dialog_y -= self.node_size // 4
+
         return dialog_x, dialog_y
     
     def create_dialog(self, type: str, current_node: Node):
@@ -285,8 +293,8 @@ class DrawingWindow(QMainWindow):
                     if clicked_node.getEndNode() or clicked_node.checkChildrenCosts():
                         self.create_dialog('set', clicked_node)
                 else:
-                    if not clicked_node.getEndNode():
-                        self.create_dialog('add', clicked_node)
+                    #if not clicked_node.getEndNode():
+                    self.create_dialog('add', clicked_node)
 
     def get_task_tree(self):
         parser = TaskParser(self.task_number)
@@ -334,6 +342,9 @@ class DrawingWindow(QMainWindow):
         else:
             self.settingCostsAction.setText("Задать выигрыши")
         self.settingCostsAction.changed.emit()
+    
+    def get_root(self):
+        return self.root
 
     def set_task_number(self, num: int):
         self.task_number = num

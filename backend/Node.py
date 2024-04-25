@@ -71,6 +71,14 @@ class Node:
             self.children = []
         self.children.append(child)
 
+    def removeChild(self, child: 'Node'):
+        new_children = []
+        for child_ in self.children:
+            if child_ != child:
+                new_children.append(child_)
+        self.children = new_children
+
+
     def deleteChildren(self):
         self.children.clear()
 

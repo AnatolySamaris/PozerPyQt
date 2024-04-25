@@ -210,9 +210,9 @@ class SetDialog(QDialog):
             #     self.set_error_both()
             # else:
             #     self.change_costs(a, b)
-        elif a == '' and b != '':
-            self.set_error_a()
-        elif a != '' and b == '':
-            self.set_error_b()
-        else:
-            self.set_error_both()
+        #elif a == '' and b != '':
+        #    self.set_error_a()
+        #elif a != '' and b == '':
+        #    self.set_error_b()
+        #else:
+        #    self.set_error_both()
