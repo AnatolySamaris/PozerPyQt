@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QLabel
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, QLabel, QMessageBox
 
 from PyQt5.QtGui import QPainter, QPen, QColor, QFont
 from PyQt5.QtCore import Qt, QEvent
@@ -54,13 +54,18 @@ class DrawingWindow(QMainWindow):
 
         self.settingCostsAction = QAction("&Задать выигрыши", self)
         self.settingCostsAction.setText("Задать выигрыши")
-        self.settingCostsAction.triggered.connect(self.settingCostsMode)
+        # self.settingCostsAction.triggered.connect(self.settingCostsMode)
+        self.settingCostsAction.triggered.connect(self.settingMode)
+
+        checkAction = QAction("&Проверить решение", self)
+        checkAction.triggered.connect(self.checkingTask)
 
         self.menubar = self.menuBar()
         self.menubar.addAction(helpAction)
         self.menubar.addAction(modeAction)
         self.menubar.addAction(clearFieldAction)
         self.menubar.addAction(self.settingCostsAction)
+        self.menubar.addAction(checkAction)
 
         ########################
         # === VARIABLES ===
@@ -72,8 +77,10 @@ class DrawingWindow(QMainWindow):
         self.y_letter_position = int(self.node_size * 0.7)
         self.x_paint_zero = 0
         self.y_paint_zero = 50
-        self.setting_costs_mode = False
+        # self.setting_costs_mode = False
+        self.mode = 'schema'
         self.arrow_size = 30
+        self.counter = 0
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
         self.root_y = self.y_paint_zero
@@ -87,6 +94,9 @@ class DrawingWindow(QMainWindow):
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
 
+    
+    def set_counter(self, counter):
+            self.counter = counter
     
     def resizeEvent(self, event):
         new_size = event.size()
@@ -169,12 +179,20 @@ class DrawingWindow(QMainWindow):
         self.root.graphTraverse(
             lambda node: self.draw_arrow(node.getParent(), node)
         )
-        if self.root.getCosts():
-            self.draw_completed_task(self.root)
+        # if self.root.getCosts():
+        #     self.draw_completed_task(self.root)
 
     def connect_nodes(self, painter: QPainter, from_node: Node, to_node: Node):
         if not from_node:
             return
+        
+        # проеряем, надо ли рисовать эту линию жирным
+        if to_node.getBoldArrow():
+            painter.setPen(QPen(Qt.black, 4, Qt.SolidLine))
+        else:
+            painter.setPen(QPen(Qt.black, 2, Qt.SolidLine))
+        painter.setBrush(Qt.black)
+
         from_x, from_y = from_node.getPosition()
         to_x, to_y = to_node.getPosition()
         painter.drawLine(
@@ -183,6 +201,8 @@ class DrawingWindow(QMainWindow):
             to_x + self.node_size // 2,
             to_y
         )
+
+        self.update()
 
     def draw_completed_task(self, node: Node):
         node_costs = node.getCosts()
@@ -207,7 +227,7 @@ class DrawingWindow(QMainWindow):
             
             painter = QPainter(self)
             painter.setRenderHint(QPainter.Antialiasing, True)
-            if task_completed:
+            if task_completed or to_node.getBoldArrow():
                 painter.setPen(QPen(Qt.black, 4, Qt.SolidLine))
             else:
                 painter.setPen(QPen(Qt.black, 2, Qt.SolidLine))
@@ -267,13 +287,13 @@ class DrawingWindow(QMainWindow):
 
         return dialog_x, dialog_y
     
-    def create_dialog(self, type: str, current_node: Node):
+    def create_dialog(self, type: str, current_node: Node, counter = None):
         if self.dialog:
             return
         if type == "add":
             self.dialog = AddDialog(self, current_node)
         elif type == "set":
-            self.dialog = SetDialog(self, current_node)
+            self.dialog = SetDialog(self, current_node, self.counter)
         else:
             return
 
@@ -283,18 +303,35 @@ class DrawingWindow(QMainWindow):
         self.dialog.show()
     
     def mousePressEvent(self, event):
+        click_pos = [event.x(), event.y()]
         if event.button() == 2:  # Правая кнопка мыши
-            click_pos = [event.x(), event.y()]
+            # click_pos = [event.x(), event.y()]
             clicked_node = self.root.graphTraverse(
                 lambda node: node.findNode(click_pos, self.node_size)
             )
             if clicked_node:
-                if self.setting_costs_mode:
+                # if self.setting_costs_mode:
+                if self.mode == 'costs':
                     if clicked_node.getEndNode() or clicked_node.checkChildrenCosts():
                         self.create_dialog('set', clicked_node)
-                else:
-                    #if not clicked_node.getEndNode():
+                        print(self.counter)
+                elif self.mode == 'schema':
                     self.create_dialog('add', clicked_node)
+                # else:
+                #     #if not clicked_node.getEndNode():
+                #     self.create_dialog('add', clicked_node)
+
+        elif event.button() == 1:
+            if self.mode == 'arrow':
+                # проходим по всем нодам и находим те ноды, между которыми есть стрелка
+                limit = 35
+                answer = self.root.graphTraverse(
+                    lambda node: self.find_arrow(node, limit, click_pos[0], click_pos[1])
+                )
+                if answer: 
+                    (child, parent) = answer
+                    child.setBoldArrow(True) 
+                    print(self.counter)
 
     def get_task_tree(self):
         parser = TaskParser(self.task_number)
@@ -311,7 +348,35 @@ class DrawingWindow(QMainWindow):
         self.setWindowTitle(self.title + f" - Вариант {self.task_number}")
         self.update()
 
-        
+    # вычисляет расстояние от клика до стрелки
+    def calculate_distance(self, child: 'Node', x, y):
+        parent = child.getParent()
+
+        if child.getX() == parent.getX(): 
+            if y >= parent.getY() and y <= child.getY():
+                d = abs(x - child.getX())
+            else:
+                d = 1000
+        else:
+            A = parent.getY() - child.getY()
+            B = child.getX() - parent.getX()
+            C = child.getY() * parent.getX() - child.getX() * parent.getY()
+
+            d = abs(A * x + B * y + C) / sqrt(A**2 + B**2)
+        return d
+
+    # вычисляем расстояние до всех стрелок (в данном случае до одной из стрелок)
+    def find_arrow(self, node: 'Node', limit, x, y):
+        if node.checkArrow(self.root):
+            (child, parent) = node.checkArrow(self.root)
+            parent = child.getParent()
+            if self.calculate_distance(child, x, y) != -1 and self.calculate_distance(child, x, y) <= limit:
+                if not node.checkBoldArrow(): self.counter += 1
+                return (child, parent)
+            else:
+                return None
+
+
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
@@ -333,15 +398,28 @@ class DrawingWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.update()
 
-    def settingCostsMode(self):
-        self.setting_costs_mode = not self.setting_costs_mode
-
+    # def settingCostsMode(self):
+    def settingMode(self):
+        # self.setting_costs_mode = not self.setting_costs_mode
         current_text = self.settingCostsAction.text()
-        if current_text == "Задать выигрыши":
+        if self.mode == 'schema': 
+            self.mode = 'costs'
+            self.settingCostsAction.setText("Нарисовать стрелки")
+        elif self.mode == 'costs': 
+            self.mode = 'arrow'
             self.settingCostsAction.setText("Построить схему")
-        else:
+        else: 
+            self.mode = 'schema'
             self.settingCostsAction.setText("Задать выигрыши")
-        self.settingCostsAction.changed.emit()
+
+        # current_text = self.settingCostsAction.text()
+        # if current_text == "Задать выигрыши":
+        #     self.settingCostsAction.setText("Построить схему")
+        # elif current_text == "Построить схему":
+        #     self.settingCostsAction.setText("Нарисовать стрелки")
+        # else:
+        #     self.settingCostsAction.setText("Задать выигрыши")
+        # self.settingCostsAction.changed.emit()
     
     def get_root(self):
         return self.root
@@ -351,3 +429,9 @@ class DrawingWindow(QMainWindow):
 
     def set_node_cost(self, node: Node, costs: Tuple[int]):
         node.setCosts(costs)
+
+    def checkingTask(self):
+        msg = QMessageBox()
+        msg.setText("Задача решена! Количество ошибок: " + str(self.counter))
+        msg.setIcon(QMessageBox.Information)
+        msg.exec_()
