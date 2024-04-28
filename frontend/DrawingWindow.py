@@ -57,15 +57,15 @@ class DrawingWindow(QMainWindow):
         # self.settingCostsAction.triggered.connect(self.settingCostsMode)
         self.settingCostsAction.triggered.connect(self.settingMode)
 
-        checkAction = QAction("&Проверить решение", self)
-        checkAction.triggered.connect(self.checkingTask)
+        # checkAction = QAction("&Проверить решение", self)
+        # checkAction.triggered.connect(self.checkingTask)
 
         self.menubar = self.menuBar()
         self.menubar.addAction(helpAction)
         self.menubar.addAction(modeAction)
         self.menubar.addAction(clearFieldAction)
         self.menubar.addAction(self.settingCostsAction)
-        self.menubar.addAction(checkAction)
+        # self.menubar.addAction(checkAction)
 
         ########################
         # === VARIABLES ===
@@ -444,6 +444,7 @@ class DrawingWindow(QMainWindow):
     def checkingTask(self):
         # if self.root.checkTask():
         msg = QMessageBox()
+        msg.setWindowTitle("Сообщение об ошибках")
         msg.setText("Задача решена! Количество ошибок: " + str(self.counter))
         msg.setIcon(QMessageBox.Information)
         msg.exec_()
