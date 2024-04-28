@@ -186,7 +186,7 @@ class DrawingWindow(QMainWindow):
         if not from_node:
             return
         
-        # проеряем, надо ли рисовать эту линию жирным
+        # проверяем, надо ли рисовать эту линию жирным
         if to_node.getBoldArrow():
             painter.setPen(QPen(Qt.black, 4, Qt.SolidLine))
         else:
@@ -314,7 +314,7 @@ class DrawingWindow(QMainWindow):
                 if self.mode == 'costs':
                     if clicked_node.getEndNode() or clicked_node.checkChildrenCosts():
                         self.create_dialog('set', clicked_node)
-                        print(self.counter)
+                        # print(self.counter)
                 elif self.mode == 'schema':
                     self.create_dialog('add', clicked_node)
                 # else:
@@ -330,8 +330,15 @@ class DrawingWindow(QMainWindow):
                 )
                 if answer: 
                     (child, parent) = answer
-                    child.setBoldArrow(True) 
-                    print(self.counter)
+                    if child.getBoldArrow():
+                        child.setBoldArrow(False) 
+                        self.counter -= 1
+                    else:
+                        child.setBoldArrow(True)
+                    print(self.root.checkTask())
+                    if self.root.checkTask(): 
+                        self.checkingTask()
+                    # print(self.counter)
 
     def get_task_tree(self):
         parser = TaskParser(self.task_number)
@@ -358,11 +365,14 @@ class DrawingWindow(QMainWindow):
             else:
                 d = 1000
         else:
-            A = parent.getY() - child.getY()
-            B = child.getX() - parent.getX()
-            C = child.getY() * parent.getX() - child.getX() * parent.getY()
+            if y <= child.getY() and y >= parent.getY() and ((x <= child.getX() and x >= parent.getX()) or (x >= child.getX() and x <= parent.getX())):
+                A = parent.getY() - child.getY()
+                B = child.getX() - parent.getX()
+                C = child.getY() * parent.getX() - child.getX() * parent.getY()
 
-            d = abs(A * x + B * y + C) / sqrt(A**2 + B**2)
+                d = abs(A * x + B * y + C) / sqrt(A**2 + B**2)
+            else:
+                d = 1000
         return d
 
     # вычисляем расстояние до всех стрелок (в данном случае до одной из стрелок)
@@ -392,6 +402,7 @@ class DrawingWindow(QMainWindow):
         mode_window.show()
 
     def clearField(self):
+        self.counter = 0
         self.root.deleteChildren()
         self.root.setCosts(())
         self.tree_height = 1
@@ -431,6 +442,7 @@ class DrawingWindow(QMainWindow):
         node.setCosts(costs)
 
     def checkingTask(self):
+        # if self.root.checkTask():
         msg = QMessageBox()
         msg.setText("Задача решена! Количество ошибок: " + str(self.counter))
         msg.setIcon(QMessageBox.Information)

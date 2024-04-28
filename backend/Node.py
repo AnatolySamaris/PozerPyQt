@@ -235,3 +235,27 @@ class Node:
                     return None
             node = node.getParent()
         return True
+    
+    # исли на каждом уровне (кроме корня) ровно одна вершина с флагом - задача решена
+    def checkTask(self):
+        treeMap = {}
+        self.fillTreeMap(treeMap)
+        countEndNode = 0
+        for level in treeMap:
+            count = 0
+            for node in treeMap[level]:
+                # у всех нод, не являющихся листами, должна быть одна жирная стрелка на уровне,
+                # а у листов - одна жирная стрелка на все листы
+                if node.getBoldArrow():
+                    if not node.getEndNode():
+                        count += 1
+                    else: 
+                        countEndNode += 1
+            # print(count)
+            if level != 1 and count != 1 and not node.getEndNode():
+                print('count: ' + str(count))
+                return False
+        if countEndNode != 1: 
+            print('countEndNode: ' + str(countEndNode))
+            return False
+        else: return True
