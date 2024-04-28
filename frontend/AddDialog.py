@@ -46,4 +46,5 @@ class AddDialog(QDialog):
         if self.current_node != self.parent().get_root():
             parent = self.current_node.getParent()
             parent.removeChild(self.current_node)
+            self.parent().update_nodes_pos()
             self.parent().update()

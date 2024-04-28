@@ -84,11 +84,10 @@ class Node:
 
     def countChildren(self):
         return len(self.children)
-    
 
     def findBestCosts(self):
         label = (self.level + 1) % 2; # 0 -> A, 1 -> B
-        tempChildren = self.children
+        tempChildren = self.children.copy()
         tempChildren.sort(
             key=lambda x: x.costs[label]
         )

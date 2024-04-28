@@ -103,6 +103,15 @@ class DrawingWindow(QMainWindow):
             self.dialog = None
         self.update()
     
+    def update_nodes_pos(self):
+        self.root.graphTraverse(
+            lambda node: node.recalculateNode(
+                self.root, self.height, self.width,
+                self.y_paint_zero, self.x_paint_zero,
+                self.node_size, self.tree_height
+            )
+        )
+    
     def create_node(self, parent: Node|None, leaf=False):
         if parent is None:
             self.root = Node(1)
@@ -118,16 +127,31 @@ class DrawingWindow(QMainWindow):
                 self.node_size, self.tree_height
             )
         )
+
+    def calibrate_cost_label(self, node: Node, text: str):
+        x_label, y_label = node.getX(), node.getY()
+        if node.getEndNode():
+            y_label += self.node_size
+        elif node == self.root:
+            x_label += int(self.node_size * 0.75)
+        else:
+            siblings = node.getParent().getChildren()
+            if siblings.index(node) >= len(siblings) // 2:
+                x_label += int(self.node_size * 0.75)
+            else:
+                x_label -= len(text) * (5 + max(len(text) - 5, 0) // 3)
+        return x_label, y_label
     
     def create_cost_label(self, painter, node: Node):
         node_costs = node.getCosts()
         if node_costs:
             text = "(" + str(node_costs[0]) + ";" + str(node_costs[1]) + ")"
             painter.setFont(QFont('Arial', 10))
+            label_pos = self.calibrate_cost_label(node, text)
             if node.getEndNode():
-                painter.drawText(node.getX(), node.getY() + self.node_size, text)
+                painter.drawText(*label_pos, text)
             else:
-                painter.drawText(node.getX() + int(self.node_size * 0.75), node.getY(), text)
+                painter.drawText(*label_pos, text)
             painter.setFont(QFont('Arial', self.letter_size))
     
     def paintEvent(self, event):
@@ -191,7 +215,6 @@ class DrawingWindow(QMainWindow):
                 self.draw_arrow(node, child, task_completed=True)
                 self.draw_completed_task(child)
                 break
-        
 
     def draw_arrow(self, from_node: Node, to_node: Node, task_completed=False):
         if not from_node:
