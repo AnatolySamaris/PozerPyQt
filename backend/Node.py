@@ -249,8 +249,9 @@ class Node:
                 if node.getBoldArrow():
                     if not node.getEndNode():
                         count += 1
-                    else: 
-                        countEndNode += 1
+                    else:
+                        if node.checkBoldArrow():
+                            countEndNode += 1
             # print(count)
             if level != 1 and count != 1 and not node.getEndNode():
                 print('count: ' + str(count))
