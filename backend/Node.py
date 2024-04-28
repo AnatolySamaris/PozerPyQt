@@ -1,7 +1,7 @@
 from typing import List
 
 class Node:
-    def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None, endNode = False):
+    def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None, endNode = False, boldArrow = False):
         self.parent = parent
         self.level = level
         self.xCoordinate = xCoordinate
@@ -9,6 +9,7 @@ class Node:
         self.children = []
         self.costs = ()
         self.endNode = endNode
+        self.boldArrow = boldArrow
 
     def setX(self, xCoordinate):
         self.xCoordinate = int(xCoordinate)
@@ -64,6 +65,13 @@ class Node:
     
     def getChildren(self):
         return self.children
+    
+
+    def setBoldArrow(self, boldArrow: bool):
+        self.boldArrow = boldArrow
+
+    def getBoldArrow(self):
+        return self.boldArrow
 
 
     def addChild(self, child: 'Node'):
@@ -130,18 +138,27 @@ class Node:
                 count += child.countLevelNodes(searchNode)
             return count
     
+    def fillTreeMap(self, treeMap):
+        try:
+            treeMap[self.getLevel()].append(self)
+        except KeyError:
+            treeMap[self.getLevel()] = [self]
+        for child in self.getChildren():
+            child.fillTreeMap(treeMap)
+    
     # рекурсивно ищет порядковый номер ноды на её уровне
     def findNodeLevelOrder(self, searchNode: 'Node'):
-        def fillTreeMap(node: 'Node', treeMap):
-            try:
-                treeMap[node.getLevel()].append(node)
-            except KeyError:
-                treeMap[node.getLevel()] = [node]
-            for child in node.getChildren():
-                fillTreeMap(child, treeMap)
+        # def fillTreeMap(node: 'Node', treeMap):
+        #     try:
+        #         treeMap[node.getLevel()].append(node)
+        #     except KeyError:
+        #         treeMap[node.getLevel()] = [node]
+        #     for child in node.getChildren():
+        #         fillTreeMap(child, treeMap)
 
         treeMap = {}
-        fillTreeMap(self, treeMap)
+        # fillTreeMap(self, treeMap)
+        self.fillTreeMap(treeMap)
         return treeMap[searchNode.getLevel()].index(searchNode) + 1
 
     def recalculateNode(self, root: 'Node', heightWindow, widthWindow, paintingZeroY, paintingZeroX, nodeSize, treeHeight):
@@ -169,6 +186,12 @@ class Node:
         treeHeight = max(treeHeight, recursiveMaxHeight(self))
         return treeHeight
     
+    def checkAllCosts(self):
+        if not self.getCosts(): return False
+        for child in self.children:
+            child.checkAllCosts()
+        return True
+        
     def checkChildrenCosts(self):
         for child in self.children:
             if not child.getCosts():
@@ -180,3 +203,59 @@ class Node:
             if child.getCosts() == costs:
                 return child
         return None
+    
+    # проверяет, что к данной ноде ведет стрелочка
+    # если нода не корень и ее выигрыши совпадают с родительскими - возвращается
+    # нода и родитель
+    def checkArrow(self, root: 'Node'):
+        if self.getLevel() > 1 and self.getCosts() == self.getParent().getCosts():
+            treeMap = {}
+            root.fillTreeMap(treeMap)
+            # for i in range(treeMap[self.getLevel()].index(self)):
+            #     if treeMap[self.getLevel()][i].getCosts() == self.getCosts():
+            #         return None
+            children = self.getParent().getChildren()
+            for i in range(children.index(self)):
+                if children[i].getCosts() == self.getCosts():
+                    return None
+            return (self, self.getParent())
+        else:
+            return None
+        
+    # все выигрыши от текущей ноды и выше должны совпадать
+    def checkBoldArrow(self):
+        node = self
+        while node.getLevel() > 1:
+            if node.getCosts() != node.getParent().getCosts():
+                return False
+            children = node.getParent().getChildren()
+            for i in range(children.index(node)):
+                if children[i].getCosts() == node.getCosts():
+                    return None
+            node = node.getParent()
+        return True
+    
+    # исли на каждом уровне (кроме корня) ровно одна вершина с флагом - задача решена
+    def checkTask(self):
+        treeMap = {}
+        self.fillTreeMap(treeMap)
+        countEndNode = 0
+        for level in treeMap:
+            count = 0
+            for node in treeMap[level]:
+                # у всех нод, не являющихся листами, должна быть одна жирная стрелка на уровне,
+                # а у листов - одна жирная стрелка на все листы
+                if node.getBoldArrow():
+                    if not node.getEndNode():
+                        count += 1
+                    else:
+                        if node.checkBoldArrow():
+                            countEndNode += 1
+            # print(count)
+            if level != 1 and count != 1 and not node.getEndNode():
+                print('count: ' + str(count))
+                return False
+        if countEndNode != 1: 
+            print('countEndNode: ' + str(countEndNode))
+            return False
+        else: return True
