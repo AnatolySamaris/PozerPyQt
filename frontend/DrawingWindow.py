@@ -81,6 +81,8 @@ class DrawingWindow(QMainWindow):
         self.mode = 'schema'
         self.arrow_size = 30
         self.counter = 0
+        self.correct_arrows = set()
+        self.selected_arrows = set()
 
         self.root_x = self.x_paint_zero + self.width // 2 - self.node_size
         self.root_y = self.y_paint_zero
@@ -94,9 +96,12 @@ class DrawingWindow(QMainWindow):
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
 
+        self.label = QLabel(self)
+        self.label.setGeometry(50, 50, 50, 50)
+
     
     def set_counter(self, counter):
-            self.counter = counter
+            self.counter += counter
     
     def resizeEvent(self, event):
         new_size = event.size()
@@ -170,6 +175,8 @@ class DrawingWindow(QMainWindow):
         painter.setPen(QPen(QColor(Qt.black), 2))
         painter.setRenderHint(QPainter.Antialiasing, True)
         self.draw_tree(painter)
+        
+        self.label.setText(str(self.counter))
         painter.end()
     
     def draw_node(self, painter: QPainter, node: Node):
@@ -203,8 +210,8 @@ class DrawingWindow(QMainWindow):
         self.root.graphTraverse(
             lambda node: self.draw_arrow(node.getParent(), node)
         )
-        # if self.root.getCosts():
-        #     self.draw_completed_task(self.root)
+        if self.root.getCosts() and len(self.correct_arrows) == 0:
+            self.get_completed_task(self.root)
 
     def connect_nodes(self, painter: QPainter, from_node: Node, to_node: Node):
         if not from_node:
@@ -226,14 +233,20 @@ class DrawingWindow(QMainWindow):
             to_y
         )
 
-        self.update()
-
     def draw_completed_task(self, node: Node):
         node_costs = node.getCosts()
         for child in node.getChildren():
             if child.getCosts() == node_costs:
                 self.draw_arrow(node, child, task_completed=True)
                 self.draw_completed_task(child)
+                break
+
+    def get_completed_task(self, node: Node):
+        node_costs = node.getCosts()
+        for child in node.getChildren():
+            if child.getCosts() == node_costs:
+                self.correct_arrows.add((node, child))
+                self.get_completed_task(child)
                 break
 
     def draw_arrow(self, from_node: Node, to_node: Node, task_completed=False):
@@ -277,7 +290,7 @@ class DrawingWindow(QMainWindow):
             x4 = int(x2 - h * l[0] - w * n[0])
             y4 = int(y2 - h * l[1] - w * n[1])
 
-            painter.drawLine(x1, y1, x2, y2)
+            #painter.drawLine(x1, y1, x2, y2)
             painter.drawLine(x2, y2, x3, y3)
             painter.drawLine(x2, y2, x4, y4)
             painter.end()
@@ -310,16 +323,15 @@ class DrawingWindow(QMainWindow):
 
         return dialog_x, dialog_y
     
-    def create_dialog(self, type: str, current_node: Node, counter = None):
+    def create_dialog(self, type: str, current_node: Node):
         if self.dialog:
             return
         if type == "add":
             self.dialog = AddDialog(self, current_node)
         elif type == "set":
-            self.dialog = SetDialog(self, current_node, self.counter)
+            self.dialog = SetDialog(self, current_node)
         else:
             return
-
         dialog_x, dialog_y = self.calibrate_dialog_window_pos(self.dialog, current_node)
         self.dialog.set_position(dialog_x, dialog_y)
         self.add_dialog_opened = True
@@ -351,6 +363,30 @@ class DrawingWindow(QMainWindow):
                 answer = self.root.graphTraverse(
                     lambda node: self.find_arrow(node, limit, click_pos[0], click_pos[1])
                 )
+                if answer:
+                    child, parent = answer
+                    if (parent, child) in self.correct_arrows:
+                        if child.getBoldArrow():
+                            self.selected_arrows.remove((parent, child))
+                            child.setBoldArrow(False)
+                        else:
+                            self.selected_arrows.add((parent, child))
+                            child.setBoldArrow(True)
+                    else:
+                        if child.getBoldArrow():
+                            # counter
+                            self.selected_arrows.remove((parent, child))
+                            child.setBoldArrow(False)
+                        else:
+                            # counter
+                            self.counter += 1
+                            self.selected_arrows.add((parent, child))
+                            child.setBoldArrow(True)
+                    self.update()
+
+                if self.selected_arrows == self.correct_arrows:
+                    self.checkingTask()
+                '''
                 if answer: 
                     (child, parent) = answer
                     if child.getBoldArrow():
@@ -360,8 +396,7 @@ class DrawingWindow(QMainWindow):
                         child.setBoldArrow(True)
                     print(self.root.checkTask())
                     if self.root.checkTask(): 
-                        self.checkingTask()
-                    # print(self.counter)
+                        self.checkingTask()'''
 
     def get_task_tree(self):
         parser = TaskParser(self.task_number)
@@ -404,7 +439,7 @@ class DrawingWindow(QMainWindow):
             (child, parent) = node.checkArrow(self.root)
             parent = child.getParent()
             if self.calculate_distance(child, x, y) != -1 and self.calculate_distance(child, x, y) <= limit:
-                if not node.checkBoldArrow(): self.counter += 1
+                #if not node.checkBoldArrow(): self.counter += 1
                 return (child, parent)
             else:
                 return None
@@ -467,7 +502,8 @@ class DrawingWindow(QMainWindow):
     def checkingTask(self):
         # if self.root.checkTask():
         msg = QMessageBox()
-        msg.setWindowTitle("Сообщение об ошибках")
-        msg.setText("Задача решена! Количество ошибок: " + str(self.counter))
+        msg.setWindowTitle("Решение завершено")
+        msg.setText("Задача решена верно!\nКоличество ошибок: " + str(self.counter))
         msg.setIcon(QMessageBox.Information)
         msg.exec_()
+

@@ -19,7 +19,7 @@ from PyQt5.QtCore import QSize, QMetaObject, Qt, QRect
 
 
 class SetDialog(QDialog):
-    def __init__(self, parent=None, current_node=None, counter = None):
+    def __init__(self, parent=None, current_node=None):
         super().__init__(parent)
         self.setObjectName("Dialog")
         self.resize(230, 150)
@@ -35,7 +35,7 @@ class SetDialog(QDialog):
         font.setFamily("Arial")
         font.setPointSize(10)
 
-        self.counter = counter
+        self.counter = 0
 
         self.verticalLayoutWidget = QWidget(self)
         self.verticalLayoutWidget.setGeometry(QRect(10, 0, 211, 151))
@@ -200,6 +200,6 @@ class SetDialog(QDialog):
                 or not self.current_node.checkChildrenCosts()
                 or (a, b) in self.current_node.findBestCosts()):
                     self.parent().set_node_cost(self.current_node, (a, b))
-                    self.parent().update()
                     self.parent().set_counter(self.counter)
+                    self.parent().update()
                     self.close()
