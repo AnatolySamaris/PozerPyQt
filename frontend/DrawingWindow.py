@@ -245,6 +245,7 @@ class DrawingWindow(QMainWindow):
         node_costs = node.getCosts()
         for child in node.getChildren():
             if child.getCosts() == node_costs:
+            # if child.checkBoldArrow():
                 self.correct_arrows.add((node, child))
                 self.get_completed_task(child)
                 break
@@ -461,6 +462,8 @@ class DrawingWindow(QMainWindow):
 
     def clearField(self):
         self.counter = 0
+        self.correct_arrows = set()
+        self.selected_arrows = set()
         self.root.deleteChildren()
         self.root.setCosts(())
         self.tree_height = 1
