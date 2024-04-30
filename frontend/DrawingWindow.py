@@ -52,20 +52,10 @@ class DrawingWindow(QMainWindow):
         clearFieldAction = QAction("&Очистить поле", self)
         clearFieldAction.triggered.connect(self.clearField)
 
-        # self.settingCostsAction = QAction("&Построение схемы", self)
-        # self.settingCostsAction.setText("Построение схемы")
-        # self.settingCostsAction.triggered.connect(self.settingCostsMode)
-        # self.settingCostsAction.triggered.connect(self.settingMode)
-
-        # checkAction = QAction("&Проверить решение", self)
-        # checkAction.triggered.connect(self.checkingTask)
-
         self.menubar = self.menuBar()
         self.menubar.addAction(helpAction)
         self.menubar.addAction(modeAction)
         self.menubar.addAction(clearFieldAction)
-        # self.menubar.addAction(self.settingCostsAction)
-        # self.menubar.addAction(checkAction)
 
         self.qmenu = QMenu("Построение схемы", self)
 
@@ -258,7 +248,6 @@ class DrawingWindow(QMainWindow):
         node_costs = node.getCosts()
         for child in node.getChildren():
             if child.getCosts() == node_costs:
-            # if child.checkBoldArrow():
                 self.correct_arrows.add((node, child))
                 self.get_completed_task(child)
                 break
@@ -354,7 +343,6 @@ class DrawingWindow(QMainWindow):
     def mousePressEvent(self, event):
         click_pos = [event.x(), event.y()]
         if event.button() == 2:  # Правая кнопка мыши
-            # click_pos = [event.x(), event.y()]
             clicked_node = self.root.graphTraverse(
                 lambda node: node.findNode(click_pos, self.node_size)
             )
@@ -366,9 +354,6 @@ class DrawingWindow(QMainWindow):
                         # print(self.counter)
                 elif self.mode == 'schema':
                     self.create_dialog('add', clicked_node)
-                # else:
-                #     #if not clicked_node.getEndNode():
-                #     self.create_dialog('add', clicked_node)
 
         elif event.button() == 1:
             if self.mode == 'arrow':
@@ -487,43 +472,6 @@ class DrawingWindow(QMainWindow):
         self.costsAction.setEnabled(True)
         self.update()
 
-    
-    # def settingMode(self):
-        # qmenu = QMenu(self)
-        # action1 = qmenu.addAction("Построение схемы")
-        # action2 = qmenu.addAction("Задание выигрышей")
-        # action3 = qmenu.addAction("Выбор стрелок")
-
-        # self.menubar.addAction(qmenu)
-
-        # action = menu.exec_(self.settingCostsAction.parentWidget().mapToGlobal(self.settingCostsAction.parentWidget().geometry().bottomLeft()))
-        # action = menu.exec_(self.settingCostsAction.parentWidget().mapToGlobal(self.settingCostsAction.geometry().bottomLeft()))
-
-        # widget = self.menubar
-        # button_pos = widget.mapToGlobal(QPoint(0, 0))
-        # action = menu.exec_(QPoint(button_pos.x() + 350, button_pos.y() + self.menubar.height()))
-       
-        # if action == action1:
-        #     self.settingCostsAction.setText("Построение схемы")
-        #     self.mode = 'schema'
-        # elif action == action2:
-        #     self.settingCostsAction.setText("Задание выигрышей")
-        #     self.mode = 'costs'
-        # elif action == action3:
-        #     if self.root.checkAllCosts():
-        #         self.settingCostsAction.setText("Выбор стрелок")
-        #         self.mode = 'arrow'
-        #     else:
-        #         msg = QMessageBox()
-        #         msg.setWindowTitle("Сообщение об ошибке")
-        #         msg.setText("Заданы не все выигрыши!")
-        #         msg.setIcon(QMessageBox.Information)
-        #         msg.exec_()
-            
-        #     # Заблокировать нажатие на "Построение схемы" и "Задание выигрышей"
-        #     for act in [action1, action2]:
-        #         act.setEnabled(False)
-
     def buildSchema(self):
         self.mode = 'schema'
         self.qmenu.setTitle('Построение схемы')
@@ -545,29 +493,6 @@ class DrawingWindow(QMainWindow):
             msg.setIcon(QMessageBox.Information)
             msg.exec_()
         
-    # def settingCostsMode(self):
-    # def settingMode(self):
-    #     # self.setting_costs_mode = not self.setting_costs_mode
-    #     current_text = self.settingCostsAction.text()
-    #     if self.mode == 'schema': 
-    #         self.mode = 'costs'
-    #         self.settingCostsAction.setText("Нарисовать стрелки")
-    #     elif self.mode == 'costs': 
-    #         self.mode = 'arrow'
-    #         self.settingCostsAction.setText("Построить схему")
-    #     else: 
-    #         self.mode = 'schema'
-    #         self.settingCostsAction.setText("Задать выигрыши")
-
-        # current_text = self.settingCostsAction.text()
-        # if current_text == "Задать выигрыши":
-        #     self.settingCostsAction.setText("Построить схему")
-        # elif current_text == "Построить схему":
-        #     self.settingCostsAction.setText("Нарисовать стрелки")
-        # else:
-        #     self.settingCostsAction.setText("Задать выигрыши")
-        # self.settingCostsAction.changed.emit()
-    
     def get_root(self):
         return self.root
 
@@ -578,10 +503,8 @@ class DrawingWindow(QMainWindow):
         node.setCosts(costs)
 
     def checkingTask(self):
-        # if self.root.checkTask():
         msg = QMessageBox()
         msg.setWindowTitle("Решение завершено")
         msg.setText("Задача решена верно!\nКоличество ошибок: " + str(self.counter))
         msg.setIcon(QMessageBox.Information)
         msg.exec_()
-
