@@ -65,7 +65,7 @@ class DrawingWindow(QMainWindow):
         self.costsAction = self.qmenu.addAction("Задание выигрышей")
         self.costsAction.triggered.connect(self.settingCosts)
 
-        self.arrowAction = self.qmenu.addAction("Выбор стрелок")
+        self.arrowAction = self.qmenu.addAction("Выделение пути")
         self.arrowAction.triggered.connect(self.selectingArrows)
 
         self.menubar.addMenu(self.qmenu)
@@ -483,7 +483,7 @@ class DrawingWindow(QMainWindow):
     def selectingArrows(self):
         if self.root.checkAllCosts():
             self.mode = 'arrow'
-            self.qmenu.setTitle('Выбор стрелок')
+            self.qmenu.setTitle('Выделение пути')
             self.schemaAction.setEnabled(False)
             self.costsAction.setEnabled(False)
         else:
