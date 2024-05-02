@@ -28,13 +28,11 @@ class DrawingWindow(QMainWindow):
         # === WINDOW CONFIG ===
         ########################
         self.title = "Позиционные игры"
-        self.top= 150
-        self.left= 150
         self.width = 1800
         self.height = 900
 
         self.setWindowTitle(self.title)
-        self.setGeometry(self.top, self.left, self.width, self.height)
+        self.setGeometry(150, 150, self.width, self.height)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowMaximizeButtonHint)
         self.center()
 
@@ -56,6 +54,7 @@ class DrawingWindow(QMainWindow):
         self.settingCostsAction.setText("Задать выигрыши")
         # self.settingCostsAction.triggered.connect(self.settingCostsMode)
         self.settingCostsAction.triggered.connect(self.settingMode)
+
 
         # checkAction = QAction("&Проверить решение", self)
         # checkAction.triggered.connect(self.checkingTask)
@@ -101,7 +100,7 @@ class DrawingWindow(QMainWindow):
 
     
     def set_counter(self, counter):
-            self.counter += counter
+        self.counter += counter
     
     def resizeEvent(self, event):
         new_size = event.size()
