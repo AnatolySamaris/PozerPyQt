@@ -97,8 +97,8 @@ class DrawingWindow(QMainWindow):
         self.tree_height = 1
         self.root = Node(1, None, self.root_x, self.root_y)
 
-        self.label = QLabel(self)
-        self.label.setGeometry(50, 50, 50, 50)
+        #self.label = QLabel(self)
+        #self.label.setGeometry(50, 50, 50, 50)
 
     
     def set_counter(self, counter):
@@ -177,7 +177,7 @@ class DrawingWindow(QMainWindow):
         painter.setRenderHint(QPainter.Antialiasing, True)
         self.draw_tree(painter)
         
-        self.label.setText(str(self.counter))
+        #self.label.setText(str(self.counter))
         painter.end()
     
     def draw_node(self, painter: QPainter, node: Node):
@@ -356,7 +356,7 @@ class DrawingWindow(QMainWindow):
         elif event.button() == 1:
             if self.mode == 'arrow':
                 # проходим по всем нодам и находим те ноды, между которыми есть стрелка
-                limit = 35
+                limit = 15
                 answer = self.root.graphTraverse(
                     lambda node: self.find_arrow(node, limit, click_pos[0], click_pos[1])
                 )
@@ -411,7 +411,7 @@ class DrawingWindow(QMainWindow):
         self.update()
 
     # вычисляет расстояние от клика до стрелки
-    def calculate_distance(self, child: 'Node', x, y):
+    '''def calculate_distance(self, child: 'Node', x, y):
         parent = child.getParent()
 
         if child.getX() == parent.getX(): 
@@ -429,13 +429,32 @@ class DrawingWindow(QMainWindow):
             else:
                 d = 1000
         return d
+    '''
+    
+    def calculate_distance(self, child, x, y):
+        parent = child.getParent()
+        x1, y1 = parent.getX() + self.node_size // 2, parent.getY() + self.node_size
+        x2, y2 = child.getX() + self.node_size // 2, child.getY()
+
+        A, B, C = y1 - y2, x2 - x1, x1 * y2 - x2 * y1
+
+        n1 = B * x - A * y + (A * y1 - B * x1)
+        n2 = B * x - A * y + (A * y2 - B * x2)
+        if n1 * n2 <= 0:
+            d = abs(A * x + B * y + C) / sqrt(A ** 2 + B ** 2)
+        else:
+            d = 10000
+        return d
 
     # вычисляем расстояние до всех стрелок (в данном случае до одной из стрелок)
     def find_arrow(self, node: 'Node', limit, x, y):
         if node.checkArrow(self.root):
             (child, parent) = node.checkArrow(self.root)
             parent = child.getParent()
-            if self.calculate_distance(child, x, y) != -1 and self.calculate_distance(child, x, y) <= limit:
+            #if self.calculate_distance(child, x, y) != -1 and self.calculate_distance(child, x, y) <= limit:
+            #chk1 = parent.getX() <= x <= child.getX() or child.getX() <= x <= parent.getX()
+            #chk2 = parent.getX() <= x <= child.getX() or child.getX() <= x <= parent.getX()
+            if self.calculate_distance(child, x, y) <= limit:
                 #if not node.checkBoldArrow(): self.counter += 1
                 return (child, parent)
             else:
