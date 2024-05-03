@@ -1,14 +1,28 @@
 from PyQt5.QtCore import QSize, QMetaObject, Qt, QRect
 from PyQt5.QtGui import QIntValidator, QFont
 from PyQt5.QtWidgets import (
-    QDialog, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,
-    QSpacerItem, QSizePolicy, QHBoxLayout, QLayout
+    QMainWindow, QDialog, QWidget, QVBoxLayout, QLabel, QLineEdit,
+    QPushButton, QSpacerItem, QSizePolicy, QHBoxLayout, QLayout
 )
+
+from backend.Node import Node
 
 
 class SetDialog(QDialog):
-    def __init__(self, parent=None, current_node=None):
+    """
+    Диалоговое окно установки выигрышей. При вводе выигрышей сразу проверяет их правильность
+    и окрашивает соответствующее поле ввода в красный цвет в случае ошибки.
+    """
+    def __init__(self, parent: QMainWindow, current_node: Node):
         super().__init__(parent)
+
+        self.current_node = current_node
+        self.error_counter = 0
+
+        #######################
+        # === DIALOG DESIGN ===
+        #######################
+
         self.setObjectName("Dialog")
         self.resize(230, 150)
         self.setMinimumSize(QSize(230, 150))
@@ -17,13 +31,10 @@ class SetDialog(QDialog):
         "    background-color: #e5e5e5;\n"
         "    border: 1px solid black;\n"
         "}")
-        self.current_node = current_node
         self.int_validator = QIntValidator(-1000, 1000, self)
         font = QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
-
-        self.error_counter = 0
 
         self.verticalLayoutWidget = QWidget(self)
         self.verticalLayoutWidget.setGeometry(QRect(10, 0, 211, 151))
@@ -133,12 +144,11 @@ class SetDialog(QDialog):
         self.lineEdit.setFocus()
         QMetaObject.connectSlotsByName(self)
 
-    def set_position(self, x: int, y: int):
-        self.x = x
-        self.y = y
-        self.move(x, y)
-
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event) -> None:
+        """
+        Обработчик нажатия на клавиши во время открытого окна.
+        Обрабатывает Enter, стрелки вверх-вниз, Escape.
+        """
         if event.key() == Qt.Key_Return:
             self.check_and_set_costs()
         elif event.key() == Qt.Key_Up:
@@ -148,14 +158,24 @@ class SetDialog(QDialog):
         elif event.key() == Qt.Key_Escape:
             self.close()
 
-    def change_costs(self):
-        a, b = self.lineEdit.text(), self.lineEdit_2.text()
+    def set_position(self, x: int, y: int) -> None:
+        """
+        Внешняя функция, вызывается из родительского окна.
+        Устанавливает позицию диалогового окна относительно родительского.
+        """
+        self.x = x
+        self.y = y
+        self.move(x, y)
 
-        if (not self.current_node.getChildren()
-                or not self.current_node.checkChildrenCosts()
-                or (a, b) in self.current_node.findBestCosts()):
-            pass
-        else:
+    def change_costs(self) -> None:
+        """
+        Проверка введенных выигрышей и изменение стилей полей ввода в случае ошибок
+        и после исправления ошибок.
+        """
+        a, b = self.lineEdit.text(), self.lineEdit_2.text()
+        if (self.current_node.getChildren()
+            and self.current_node.checkChildrenCosts()
+            and (a, b) not in self.current_node.findBestCosts()):
             a_is_valid = a != '' and any(tup[0] == int(a) for tup in self.current_node.findBestCosts())
             b_is_valid = b != '' and any(tup[1] == int(b) for tup in self.current_node.findBestCosts())
 
@@ -178,8 +198,11 @@ class SetDialog(QDialog):
                     self.error_counter += 1
                 self.lineEdit_2.setProperty('previousText', b)
 
-
-    def check_and_set_costs(self):
+    def check_and_set_costs(self) -> None:
+        """
+        Устанавливает введенные выигрыши и рисует их в родительском окне, если
+        значения были введены верно. После установки выигрышей окно закрывается.
+        """
         a, b = self.lineEdit.text(), self.lineEdit_2.text()
         if a != '' and b != '':
             a, b = int(a), int(b)

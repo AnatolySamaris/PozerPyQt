@@ -11,7 +11,13 @@ from PyQt5.QtWidgets import (
 
 
 class ModeWindow(QMainWindow):
-    def __init__(self, parent=None):
+    """
+    Окно выбора режима ввода. По умолчанию выбран ввод вручную.
+    При выборе режима загрузки варианта открывается поле ввода номера варианта.
+    Если вариант введет верно (число от 1 до 100), в главном окне появляется
+    соответствующее задание, а окно выбора ввода закрывается.
+    """
+    def __init__(self, parent: QMainWindow):
         super().__init__(parent)
         self.setObjectName("MainWindow")
         self.setWindowTitle("Режим ввода")
@@ -91,33 +97,50 @@ class ModeWindow(QMainWindow):
         
         QMetaObject.connectSlotsByName(self)
     
-    def center(self):
+    def center(self) -> None:
+        """
+        Устанавливает окно по центру экрана.
+        """
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event) -> None:
+        """
+        Обработчик нажатия на клавиши во время открытого окна.
+        Обрабатывает Enter, стрелки вверх-вниз.
+        """
         if event.key() == Qt.Key_Return:
             self.handle_mode()
         elif event.key() == Qt.Key_Up:
-            # self.lineEdit.setDisabled(False)
             self.radioButton.setFocus()
         elif event.key() == Qt.Key_Down:
-            # self.lineEdit.setDisabled(True)
             self.radioButton_2.setFocus()
 
-    def change_mode(self):
+    def change_mode(self) -> None:
+        """
+        Включает возможность ввода в поле ввода, если выбрано "Вариант"
+        и отключает в противном случае.
+        """
         if self.radioButton.isChecked():
             self.lineEdit.setDisabled(False)
         else:
             self.lineEdit.setDisabled(True)
 
-    def show_warning(self, title: str, message: str):
+    def show_warning(self, title: str, message: str) -> None:
+        """
+        Выводит окно с сообщением об ошибке ввода.
+        """
         self.lineEdit.setStyleSheet('border: 1px solid red;')
         QMessageBox.warning(self, title, message)
 
-    def handle_mode(self):
+    def handle_mode(self) -> None:
+        """
+        Если выбрано "Вариант", проверяет ввод на правильность
+        и открывает задания введенного варианта в случае правильно введенного значения варианта.
+        После открытия задания окно закрывается.
+        """
         if self.radioButton.isChecked():
             if len(self.lineEdit.text().strip()) == 0:
                 self.show_warning(

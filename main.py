@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication
 import sys
 
+
 sys.path.append('./backend')
 sys.path.append('./frontend')
 
