@@ -1,6 +1,12 @@
 from .Node import Node
 
 class TaskParser:
+    """
+    Класс парсера, содержащий методы для обработки готовых вариантов.
+    Переменная allCosts представляет собой словарь, в качестве ключей которого
+    выступают номера вариантов, в качестве значений - списки аыигрышей для каждого
+    варианта.
+    """
     allCosts = {
         1: [
             (-4,-6), (-3,1), (7,-4), (7,-3), (-3,-8), (-1,-1), (-4,-1), (1,-5), (2,4),
@@ -604,15 +610,19 @@ class TaskParser:
         ]
     }
 
-    # по номеру варианта в поле с выигрышами записывается нужный список
     def __init__(self, variant, allCosts = allCosts):
-        self.allCosts = allCosts
+        """
+        По номеру варианта в поле costs, представляющее собой список выигрышей,
+        записывается список конкретных выигрышей для данного варианта.
+        """
+        self.allCosts = allCosts    
         self.variant = variant
         self.costs = allCosts[variant]
 
-    # создает схему, в качестве аргумента передавать root
     def createSchema(self, node11):
-        # node11 = Node(level=1)
+        """
+        Создает дерево игры и прикрепляет его к вершине, от которой вызывается.
+        """
 
         node21 = Node(level = 2, parent = node11)
         node22 = Node(level = 2, parent = node11)
@@ -764,20 +774,16 @@ class TaskParser:
         node625.setChildren([node717, node718])
 
     def __checkEndNode(self, node: 'Node', lst: list):
+        """
+        Проверяет, является ли вершина конечной.
+        Если да - добавляет ее в список.
+        """
         if node.getEndNode(): lst.append(node)
 
-    # формирует список всех 36 листов в нужном порядке
-    #def createEndNodesList(self, root: 'Node'):
-    #    lst = []
-    #    root.graphTraverse(
-    #        lambda node: self.checkEndNode(node, lst)
-    #    )
-    #    return lst
-
-    # функция присвоения выигрышей всем листам
-    # принимает список с 36 выигрышами в зависимости от варианта,
-    # а также список нод, сформированный функцией createEndNodesList
     def setCosts(self, root: 'Node'):
+        """
+        Присваивает выигрыши, хранящиеся в переменной costs, всем конечным вершинам.
+        """
         lst = []
         root.graphTraverse(
             lambda node: self.__checkEndNode(node, lst)
