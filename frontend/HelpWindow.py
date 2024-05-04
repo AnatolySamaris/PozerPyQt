@@ -4,6 +4,10 @@ from PyQt5.QtGui import QFont
 
 
 class HelpWindow(QMainWindow):
+    """
+    Окно справки, которое содержит инструкции для пользователя по работе с программой.
+    Справка разделена на блоки, параметры каждого из которых задаются в методе __init__.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Справка")
@@ -14,12 +18,15 @@ class HelpWindow(QMainWindow):
         font.setFamily("Arial")
         font.setPointSize(10)
 
+        """
+        Поля класса, содержащие текст каждого блока справки.
+        """
         self.text_general = QTextEdit("""
             Программа позволяет пользователю составить и проверить решение позиционной игры двух игроков.<br><br>
             При запуске программы пользователь может выбрать один из двух режимов работы:<br> 
                 &nbsp;&nbsp;&nbsp;&nbsp;- ввод из файла;<br> 
                 &nbsp;&nbsp;&nbsp;&nbsp;- ручной ввод.<br> 
-            Режим ручного ввода задан по умолчанию, при необходимости его можно изменить с помощью кнопки "Режим работы". Для переключения между режимами можно использовать стрелки вниз-вверх<br><br> 
+            Режим ручного ввода задан по умолчанию, при необходимости его можно изменить с помощью кнопки "Режим работы". Для переключения между режимами можно использовать стрелки вниз-вверх.<br><br> 
 
             При решении задачи пользователь может работать в трех режимах:<br> 
                 &nbsp;&nbsp;&nbsp;&nbsp;- построение схемы;<br> 
@@ -32,14 +39,12 @@ class HelpWindow(QMainWindow):
                 &nbsp;&nbsp;&nbsp;&nbsp;- режим выбора стрелок доступен лишь после введения всех выигрышей; <br>
                 &nbsp;&nbsp;&nbsp;&nbsp;- из режима выбора стрелок нельзя перейти в режимы построения схемы и задания выигрышей (однако можно очистить поле и начать решение задачи заново).
         """)
-
         self.text_load = QTextEdit("""
             Пользователь может использовать один из 100 готовых вариантов. 
             Для этого необходимо кликнуть по кнопке "Режим работы", выбрать опцию "Вариант", затем указать номер нужного варианта от 1 до 100. Для сохранения результата необходимо нажать кнопку "ОК" или кнопку Enter на клавиатуре. <br><br>
                                    
             При некорректном вводе номера варианта поле ввода станет красным и будет показано информационное сообщение.
         """)
-
         self.text_schema = QTextEdit("""
             Пользователь находится в режиме построения схемы, если в меню отображается кнопка "Построение схемы".<br><br>
                                       
@@ -54,7 +59,6 @@ class HelpWindow(QMainWindow):
                                      
             ОГРАНИЧЕНИЕ: к исходам нельзя добавлять потомков.
         """)
-
         self.text_costs = QTextEdit("""
             Пользователь находится в режиме задания выигрышей, если в меню отображается кнопка "Задание выигрышей".<br><br>
  
@@ -67,20 +71,21 @@ class HelpWindow(QMainWindow):
                                     
             ОГРАНИЧЕНИЕ: нельзя задавать выигрыши тем вершинам, которые имеют хотя бы одного потомка без выигрышей.
         """)
-
         self.text_arrows = QTextEdit("""
             Пользователь находится в режиме выделения пути, если в меню показывается кнопка "Выделение пути".<br><br>
             
             Для того, чтобы выделить стрелку, необходимо кликнуть по ней левой кнопкой мыши. <br>
             Если все стрелки были выбраны верно, появится сообщение о верном решении задачи с указанием количества допущенных ошибок.
         """)
-
         self.text_about = QTextEdit("""
             Решение позиционных игр.<br>
             &#169; ЛГТУ, 2024 г <br>
             Седых О.М., Целищев А.Е.
         """)
 
+        """
+        Установление шрифта font тексту каждого блока.
+        """
         self.text_general.setFont(font)
         self.text_load.setFont(font)
         self.text_schema.setFont(font)
@@ -88,7 +93,9 @@ class HelpWindow(QMainWindow):
         self.text_arrows.setFont(font)
         self.text_about.setFont(font)
 
-        # Создаем виджет для отображения инструкций
+        """
+        Формирование виджета для отображения инструкций.
+        """
         self.tab_widget = QTabWidget(self)
         self.tab_widget.addTab((self.text_general), "Общие сведения")
         self.tab_widget.addTab((self.text_load), "Загрузка из файла")
@@ -97,17 +104,20 @@ class HelpWindow(QMainWindow):
         self.tab_widget.addTab((self.text_arrows), "Выделение пути")
         self.tab_widget.addTab((self.text_about), "О программе")
 
-        # Запрещаем редактирование текста в каждом QTextEdit
+        """
+        Запрет редактирования текста в каждом блоке инструкций.
+        """
         for index in range(self.tab_widget.count()):
             self.text_edit = self.tab_widget.widget(index)
-            self.text_edit.setReadOnly(True)
-            self.text_edit.setTabChangesFocus(True)
             self.text_edit.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
 
         self.setCentralWidget(self.tab_widget)
         self.show()
 
     def center(self):
+        """
+        Располагает окно справки по центру экрана.
+        """
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)

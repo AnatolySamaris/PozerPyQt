@@ -1,6 +1,10 @@
 from typing import List
 
 class Node:
+    """
+    Класс вершины.
+    Параметры вершины задаются в методе __init__.
+    """
     def __init__(self, level = None, parent = None, xCoordinate = None, yCoordinate = None, endNode = False, boldArrow = False):
         self.parent = parent
         self.level = level
@@ -75,11 +79,17 @@ class Node:
 
 
     def addChild(self, child: 'Node'):
+        """
+        Добавляет потомка в список потомков вершины, от которой вызывается метод.
+        """
         if (self.children == None):
             self.children = []
         self.children.append(child)
 
     def removeChild(self, child: 'Node'):
+        """
+        Удаляет указанного потомка из списка потомков вершины, от которой вызывается метод.
+        """
         new_children = []
         for child_ in self.children:
             if child_ != child:
@@ -88,12 +98,22 @@ class Node:
 
 
     def deleteChildren(self):
+        """
+        Удаляет всех потомков вершины.
+        """
         self.children.clear()
 
     def countChildren(self):
+        """
+        Возвращает число потомков вершины.
+        """
         return len(self.children)
 
     def findBestCosts(self):
+        """
+        Возвращает наиболее выгодную из имеющихся пару выигрышей для вершины, 
+        от которой вызывается метод.
+        """
         label = (self.level + 1) % 2; # 0 -> A, 1 -> B
         tempChildren = self.children.copy()
         tempChildren.sort(
@@ -103,19 +123,22 @@ class Node:
         return [child.costs for child in tempChildren if child.costs[label] == best_cost]
     
 
-    # рекурсивная функция обхода графа, вызывающая некоторую
-    # функцию для каждой вершины
     def graphTraverse(self, function):
+        """
+        Рекурсивно обходит граф и вызывает некоторую функцию, переданную 
+        в качестве аргумента, для каждой вершины.
+        """
         res = function(self)
         if res: return res
         for child in self.getChildren():
             res = child.graphTraverse(function)
             if res: return res
 
-    # функция поиска ноды
-    # в данном случае аргумент node - объект, с которым сравнивают
-    # текущую ноду
     def findNode(self, click: List[int], nodeSize: int):
+        """
+        Определяет, попадают ли координаты клика в область вершины.
+        В качестве аргументов принимает координаты клика и размер вершины.
+        """
         delta = nodeSize // 2
         if(
             abs(self.getX() + delta - click[0]) <= delta and
@@ -125,11 +148,12 @@ class Node:
         else:
             return None
 
-    # рекурсивно считает число нод на уровне
-    # вызывается как метод вершины root,
-    # при этом searchNode - нода, для которой нужно определить
-    # число нод на уровне
     def countLevelNodes(self, searchNode: 'Node'):
+        """
+        Рекурсивно считает число нод на уровне.
+        Должен вызываться как метод вершины root.
+        При этом аргумент searchNode - вершина, для которой нужно определить число нод на уровне.
+        """
         if self.getLevel() == searchNode.getLevel():
             return 1
         else:
@@ -139,6 +163,10 @@ class Node:
             return count
     
     def fillTreeMap(self, treeMap):
+        """
+        Заполняет переданный в качестве аргумента словарь следующим образом: 
+        в качестве ключей выступают номера уровней, в качестве значений - списки вершин на этих уровнях.
+        """
         try:
             treeMap[self.getLevel()].append(self)
         except KeyError:
@@ -146,22 +174,20 @@ class Node:
         for child in self.getChildren():
             child.fillTreeMap(treeMap)
     
-    # рекурсивно ищет порядковый номер ноды на её уровне
     def findNodeLevelOrder(self, searchNode: 'Node'):
-        # def fillTreeMap(node: 'Node', treeMap):
-        #     try:
-        #         treeMap[node.getLevel()].append(node)
-        #     except KeyError:
-        #         treeMap[node.getLevel()] = [node]
-        #     for child in node.getChildren():
-        #         fillTreeMap(child, treeMap)
-
+        """
+        Рекурсивно ищет порядковый номер вершины на ее уровне.
+        """
         treeMap = {}
-        # fillTreeMap(self, treeMap)
         self.fillTreeMap(treeMap)
         return treeMap[searchNode.getLevel()].index(searchNode) + 1
 
     def recalculateNode(self, root: 'Node', heightWindow, widthWindow, paintingZeroY, paintingZeroX, nodeSize, treeHeight):
+        """
+        Вычисляет координаты вершины, от которой вызывается метод.
+        Используется при изменении схемы каким-либо образом: добавлении/удалении вершины.
+        В качестве арргументов принимает необходимые для вычислений параметры окна.
+        """
         # считаем Y коодинату
         spaceVertical = (heightWindow - paintingZeroY - nodeSize * treeHeight) / (treeHeight + 1)
         self.setY(paintingZeroY + nodeSize * (self.getLevel() - 1) + spaceVertical * (self.getLevel() - 1))
@@ -173,6 +199,10 @@ class Node:
         self.setX(paintingZeroX + nodeSize * (nodeLevelOrder - 1) + spaceHoriz * nodeLevelOrder)
 
     def updateTreeHeight(self, treeHeight):
+        """
+        Обновляет высоту дерева, которая передается в качестве аргумента.
+        Вызывается от корневой вершины при изменении числа уровней.
+        """
         def recursiveMaxHeight(node):
             # если нет детей
             if not node.getChildren():
@@ -187,33 +217,41 @@ class Node:
         return treeHeight
     
     def checkAllCosts(self):
+        """
+        Рекурсивно проверяет, всем ли вершинам заданы выигрыши.
+        """
         if not self.getCosts(): return False
         for child in self.children:
             child.checkAllCosts()
         return True
         
     def checkChildrenCosts(self):
+        """
+        Проверяет, всем ли потомкам вершины заданы выигрыши.
+        """
         for child in self.children:
             if not child.getCosts():
                 return False
         return True
     
     def findChildByCosts(self, costs):
+        """
+        Определяет, есть ли среди потомков вершины потомок с заданными выигрышами
+        (выигрыши передаются в качестве аргументов).
+        """
         for child in self.children:
             if child.getCosts() == costs:
                 return child
         return None
-    
-    # проверяет, что к данной ноде ведет стрелочка
-    # если нода не корень и ее выигрыши совпадают с родительскими - возвращается
-    # нода и родитель
+        
     def checkArrow(self, root: 'Node'):
+        """
+        Проверяет, ведет ли к данной вершине стрелка.
+        Если да - возвращает данную вершину и ее родителя.
+        """
         if self.getLevel() > 1 and self.getCosts() == self.getParent().getCosts():
             treeMap = {}
             root.fillTreeMap(treeMap)
-            # for i in range(treeMap[self.getLevel()].index(self)):
-            #     if treeMap[self.getLevel()][i].getCosts() == self.getCosts():
-            #         return None
             children = self.getParent().getChildren()
             for i in range(children.index(self)):
                 if children[i].getCosts() == self.getCosts():
@@ -221,41 +259,3 @@ class Node:
             return (self, self.getParent())
         else:
             return None
-        
-    # все выигрыши от текущей ноды и выше должны совпадать
-    def checkBoldArrow(self):
-        node = self
-        while node.getLevel() > 1:
-            if node.getCosts() != node.getParent().getCosts():
-                return False
-            children = node.getParent().getChildren()
-            for i in range(children.index(node)):
-                if children[i].getCosts() == node.getCosts():
-                    return None
-            node = node.getParent()
-        return True
-    
-    # исли на каждом уровне (кроме корня) ровно одна вершина с флагом - задача решена
-    def checkTask(self):
-        treeMap = {}
-        self.fillTreeMap(treeMap)
-        countEndNode = 0
-        for level in treeMap:
-            count = 0
-            for node in treeMap[level]:
-                # у всех нод, не являющихся листами, должна быть одна жирная стрелка на уровне,
-                # а у листов - одна жирная стрелка на все листы
-                if node.getBoldArrow():
-                    if not node.getEndNode():
-                        count += 1
-                    else:
-                        if node.checkBoldArrow():
-                            countEndNode += 1
-            # print(count)
-            if level != 1 and count != 1 and not node.getEndNode():
-                print('count: ' + str(count))
-                return False
-        if countEndNode != 1: 
-            print('countEndNode: ' + str(countEndNode))
-            return False
-        else: return True
