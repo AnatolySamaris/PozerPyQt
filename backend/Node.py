@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 class Node:
     """
@@ -15,70 +15,70 @@ class Node:
         self.endNode = endNode
         self.boldArrow = boldArrow
 
-    def setX(self, xCoordinate):
+    def setX(self, xCoordinate: int) -> None:
         self.xCoordinate = int(xCoordinate)
 
-    def setY(self, yCoordinate):
+    def setY(self, yCoordinate: int) -> None:
         self.yCoordinate = int(yCoordinate)
 
-    def getX(self):
+    def getX(self) -> int:
         return self.xCoordinate
 
-    def getY(self):
+    def getY(self) -> int:
         return self.yCoordinate
     
 
-    def setLevel(self, level):
+    def setLevel(self, level: int) -> None:
         self.level = level
 
-    def getLevel(self):
+    def getLevel(self) -> int:
         return self.level    
     
 
-    def setParent(self, parent: 'Node'):
+    def setParent(self, parent: 'Node') -> None:
         self.parent = parent
 
-    def getParent(self):
+    def getParent(self) -> 'Node':
         return self.parent
 
 
-    def setCosts(self, costs):
+    def setCosts(self, costs: Tuple[int]) -> None:
         self.costs = costs
 
-    def getCosts(self):
+    def getCosts(self) -> Tuple[int]:
         return self.costs
     
 
     def setEndNode(self, endNode: bool):
         self.endNode = endNode
 
-    def getEndNode(self):
+    def getEndNode(self) -> bool:
         return self.endNode
     
 
-    def setPosition(self, xCoordinate, yCoordinate):
+    def setPosition(self, xCoordinate: int, yCoordinate: int) -> None:
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
 
-    def getPosition(self):
+    def getPosition(self) -> List[int]:
         return [self.xCoordinate, self.yCoordinate]
     
 
-    def setChildren(self, children: list):
+    def setChildren(self, children: list) -> None:
         self.children = children
     
-    def getChildren(self):
+    def getChildren(self) -> List['Node']:
         return self.children
     
 
-    def setBoldArrow(self, boldArrow: bool):
+    def setBoldArrow(self, boldArrow: bool) -> None:
         self.boldArrow = boldArrow
 
-    def getBoldArrow(self):
+    def getBoldArrow(self) -> bool:
         return self.boldArrow
 
 
-    def addChild(self, child: 'Node'):
+    def addChild(self, child: 'Node') -> None:
         """
         Добавляет потомка в список потомков вершины, от которой вызывается метод.
         """
@@ -86,7 +86,7 @@ class Node:
             self.children = []
         self.children.append(child)
 
-    def removeChild(self, child: 'Node'):
+    def removeChild(self, child: 'Node') -> None:
         """
         Удаляет указанного потомка из списка потомков вершины, от которой вызывается метод.
         """
@@ -97,19 +97,19 @@ class Node:
         self.children = new_children
 
 
-    def deleteChildren(self):
+    def deleteChildren(self) -> None:
         """
         Удаляет всех потомков вершины.
         """
         self.children.clear()
 
-    def countChildren(self):
+    def countChildren(self) -> int:
         """
         Возвращает число потомков вершины.
         """
         return len(self.children)
 
-    def findBestCosts(self):
+    def findBestCosts(self) -> Tuple[int]:
         """
         Возвращает наиболее выгодную из имеющихся пару выигрышей для вершины, 
         от которой вызывается метод.
@@ -148,7 +148,7 @@ class Node:
         else:
             return None
 
-    def countLevelNodes(self, searchNode: 'Node'):
+    def countLevelNodes(self, searchNode: 'Node') -> int:
         """
         Рекурсивно считает число нод на уровне.
         Должен вызываться как метод вершины root.
@@ -174,7 +174,7 @@ class Node:
         for child in self.getChildren():
             child.fillTreeMap(treeMap)
     
-    def findNodeLevelOrder(self, searchNode: 'Node'):
+    def findNodeLevelOrder(self, searchNode: 'Node') -> int:
         """
         Рекурсивно ищет порядковый номер вершины на ее уровне.
         """
@@ -198,7 +198,7 @@ class Node:
         spaceHoriz = (widthWindow - nodeSize * levelNodesAmount) / (levelNodesAmount + 1)
         self.setX(paintingZeroX + nodeSize * (nodeLevelOrder - 1) + spaceHoriz * nodeLevelOrder)
 
-    def updateTreeHeight(self, treeHeight):
+    def updateTreeHeight(self, treeHeight: int) -> int:
         """
         Обновляет высоту дерева, которая передается в качестве аргумента.
         Вызывается от корневой вершины при изменении числа уровней.
@@ -216,7 +216,7 @@ class Node:
         treeHeight = max(treeHeight, recursiveMaxHeight(self))
         return treeHeight
     
-    def checkAllCosts(self):
+    def checkAllCosts(self) -> bool:
         """
         Рекурсивно проверяет, всем ли вершинам заданы выигрыши.
         """
@@ -225,7 +225,7 @@ class Node:
             child.checkAllCosts()
         return True
         
-    def checkChildrenCosts(self):
+    def checkChildrenCosts(self) -> bool:
         """
         Проверяет, всем ли потомкам вершины заданы выигрыши.
         """
