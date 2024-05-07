@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QDialog, QAction, QMessageBox, QMenu
 
-from PyQt5.QtGui import QPainter, QPen, QColor, QFont
+from PyQt5.QtGui import QPainter, QPen, QColor, QFont, QIcon
 from PyQt5.QtCore import Qt, QEvent
 
 from .HelpWindow import HelpWindow
@@ -33,6 +33,7 @@ class DrawingWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(150, 150, self.width, self.height)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowMaximizeButtonHint)
+        self.setWindowIcon(QIcon('../PosGames.ico'))
         self.center()
 
         self.installEventFilter(self)
