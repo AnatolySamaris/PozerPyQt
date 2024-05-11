@@ -173,9 +173,11 @@ class SetDialog(QDialog):
         и после исправления ошибок.
         """
         a, b = self.lineEdit.text(), self.lineEdit_2.text()
+
         if (self.current_node.getChildren()
             and self.current_node.checkChildrenCosts()
             and (a, b) not in self.current_node.findBestCosts()):
+
             a_is_valid = a != '' and any(tup[0] == int(a) for tup in self.current_node.findBestCosts())
             b_is_valid = b != '' and any(tup[1] == int(b) for tup in self.current_node.findBestCosts())
 
@@ -204,7 +206,7 @@ class SetDialog(QDialog):
         значения были введены верно. После установки выигрышей окно закрывается.
         """
         a, b = self.lineEdit.text(), self.lineEdit_2.text()
-        if a != '' and b != '':
+        if a != '' and a != '+' and a != '-' and b != '' and b != '+' and b != '-':
             a, b = int(a), int(b)
             if (not self.current_node.getChildren()
                 or not self.current_node.checkChildrenCosts()
