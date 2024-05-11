@@ -358,7 +358,7 @@ class DrawingWindow(QMainWindow):
     # === CREATING OBJECTS ===
     ##########################
 
-    def create_node(self, parent: Node|None, leaf=False) -> None:
+    def create_node(self, parent, leaf=False) -> None:
         """
         Создает вершину дерева. Если родитель не передан - создается корень дерева.
         """
@@ -421,7 +421,7 @@ class DrawingWindow(QMainWindow):
                 self.get_completed_task(child)
                 break
 
-    def calculate_distance(self, child: Node, x: int, y: int) -> int|float:
+    def calculate_distance(self, child: Node, x: int, y: int) -> float:
         """
         Рассчитывает расстояние от клика до линии. Для учета конечной длины стрелки
         проверяет, находится ли точка клика между перпендикулярными прямыми, проходящими
@@ -436,10 +436,10 @@ class DrawingWindow(QMainWindow):
         if n1 * n2 <= 0:
             d = abs(A * x + B * y + C) / sqrt(A ** 2 + B ** 2)
         else:
-            d = 10000
+            d = 10000.0
         return d
 
-    def find_arrow(self, node: Node, x: int, y: int) -> Tuple[Node]|None:
+    def find_arrow(self, node: Node, x: int, y: int):
         """
         Проверяет, выбрана ли стрелка. Если да - возвращает потомка и родителя.
         Иначе возвращает None.
@@ -546,3 +546,12 @@ class DrawingWindow(QMainWindow):
     
     def increment_counter(self, counter):
         self.error_counter += counter
+
+    def update_nodes_pos(self):
+        self.root.graphTraverse(
+            lambda node: node.recalculateNode(
+                self.root, self.height, self.width,
+                self.y_paint_zero, self.x_paint_zero,
+                self.node_size, self.tree_height
+            )
+        )
